@@ -56,6 +56,21 @@ class UiContractTests(unittest.TestCase):
             with self.subTest(marker=marker):
                 self.assertIn(marker, source)
 
+    def test_graph_uses_canvas_grid_collision_and_shortest_path(self):
+        """The graph renderer keeps its scalable Canvas algorithms in a dedicated module."""
+        source = (ROOT / "ui" / "graph.js").read_text(encoding="utf-8")
+        for symbol in ("class SpatialGrid", "resolveLabelCollisions", "shortestPath", "requestAnimationFrame", "devicePixelRatio"):
+            with self.subTest(symbol=symbol):
+                self.assertIn(symbol, source)
+        self.assertNotIn("document.createElementNS", source)
+
+    def test_app_wires_canvas_graph_to_data_filters_and_controls(self):
+        """Graph data, category toggles, and stage controls stay connected to the Canvas owner."""
+        source = (ROOT / "ui" / "app.js").read_text(encoding="utf-8")
+        for marker in ("KnowledgeGraph", '"jarvis:graph"', '"jarvis:filter"', "setTypeFilter", "fitToView", "setLabelsVisible"):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, source)
+
 
 if __name__ == "__main__":
     unittest.main()

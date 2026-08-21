@@ -1,4 +1,5 @@
 import { ASSISTANT_STATES, getAssistantState, setAssistantState } from "./reactor.js";
+import { KnowledgeGraph } from "./graph.js";
 
 const CATEGORY_COLORS = ["#43c7f4", "#f6b83f", "#a48bff", "#44cf86", "#ef78ad", "#fa9947", "#d8e0e8"];
 const messagesElement = document.querySelector("#messages");
@@ -11,6 +12,7 @@ let pendingMemory = null;
 let recoveryTimer = null;
 let stateGeneration = 0;
 const panelOpeners = new Map();
+let graphView = null;
 
 export async function api(path, options = {}) {
   const response = await fetch(path, options);
@@ -257,6 +259,30 @@ function renderTopHubs(nodes) {
   }));
 }
 
+function initialiseGraph() {
+  const canvas = document.querySelector("#graph-canvas");
+  if (!canvas) return;
+  graphView = new KnowledgeGraph(canvas, {
+    onFocus: (node) => {
+      if (node) window.dispatchEvent(new CustomEvent("jarvis:node", { detail: { id: node.id } }));
+    },
+  });
+  window.addEventListener("jarvis:graph", (event) => graphView?.setData(event.detail || {}));
+  window.addEventListener("jarvis:filter", (event) => {
+    const { type, enabled } = event.detail || {};
+    if (type) graphView?.setTypeFilter(type, enabled);
+  });
+  window.addEventListener("jarvis:graph-action", (event) => {
+    if (event.detail?.action === "fit") graphView?.fitToView();
+    if (event.detail?.action === "labels") {
+      const control = document.querySelector('[data-graph-action="labels"]');
+      const visible = control?.getAttribute("aria-pressed") !== "false";
+      graphView?.setLabelsVisible(visible);
+    }
+  });
+  window.addEventListener("pagehide", () => graphView?.destroy(), { once: true });
+}
+
 async function loadInspector(nodeId) {
   try {
     const node = await api(`/api/node/${encodeURIComponent(nodeId)}`);
@@ -325,6 +351,7 @@ function initialiseInteractions() {
     window.dispatchEvent(new CustomEvent("jarvis:filter", { detail: { type: filter.dataset.type, enabled } }));
   });
   document.querySelectorAll("[data-graph-action]").forEach((button) => button.addEventListener("click", () => {
+    if (button.dataset.graphAction === "labels") button.setAttribute("aria-pressed", String(button.getAttribute("aria-pressed") !== "true"));
     window.dispatchEvent(new CustomEvent("jarvis:graph-action", { detail: { action: button.dataset.graphAction } }));
   }));
   window.addEventListener("jarvis:node", (event) => { if (event.detail?.id) void loadInspector(event.detail.id); });
@@ -342,6 +369,7 @@ function initialiseInteractions() {
 }
 
 async function initialise() {
+  initialiseGraph();
   initialiseInteractions();
   setState(ASSISTANT_STATES.IDLE);
   const startupGeneration = stateGeneration;
