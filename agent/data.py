@@ -23,6 +23,18 @@ class DataGateway:
     def documents(self) -> list[dict[str, object]]:
         return list(self.load_dataset()["documents"])
 
+    def vault_index(self, config_path: Path | None = None):
+        from agent.vault import VaultIndex
+
+        if is_demo_mode():
+            index = VaultIndex(source_documents=self.documents())
+            index.build()
+            index.add_edges(self.load_dataset()["edges"])
+            return index
+        index = VaultIndex.from_roots(self.configured_roots(config_path))
+        index.build()
+        return index
+
     def configured_roots(self, config_path: Path | None = None) -> tuple[Path, ...]:
         if is_demo_mode():
             return ()
