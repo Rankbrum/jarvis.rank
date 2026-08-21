@@ -187,7 +187,10 @@ async function submitMemory() {
     pendingMemory = null;
     setState(ASSISTANT_STATES.IDLE);
   } catch (error) {
-    pendingMemory = null;
+    pendingMemory.submitting = false;
+    cardElement.querySelectorAll("button").forEach((button) => { button.disabled = false; });
+    const [retry] = cardElement.querySelectorAll("button");
+    if (retry) retry.textContent = "Tentar salvar";
     presentError(error.code || "REQUEST_FAILED", error.message);
   }
 }
@@ -201,6 +204,16 @@ function renderStatus(status) {
   document.querySelector("[data-status-data]").textContent = `${String(status.data_source || "local").toUpperCase()} · ${status.indexed_documents || 0}`;
   document.querySelector("[data-status-model]").textContent = status.model_connected ? "CONNECTED" : "LIMITED";
   document.querySelector("[data-status-voice]").textContent = status.voice_configured ? "READY" : "OFFLINE";
+}
+
+function renderStatusUnavailable() {
+  const badge = document.querySelector("#mode-badge");
+  badge.textContent = "STATUS UNAVAILABLE";
+  badge.dataset.mode = "limited";
+  document.querySelector("[data-status]").textContent = "Não foi possível verificar o sistema local. Verifique o servidor e recarregue a página.";
+  document.querySelector("[data-status-data]").textContent = "UNAVAILABLE";
+  document.querySelector("[data-status-model]").textContent = "UNKNOWN";
+  document.querySelector("[data-status-voice]").textContent = "UNKNOWN";
 }
 
 function renderGraphSummary(graph) {
@@ -334,6 +347,7 @@ async function initialise() {
   const startupGeneration = stateGeneration;
   const [status, graph] = await Promise.allSettled([api("/api/status"), api("/api/graph")]);
   if (status.status === "fulfilled") renderStatus(status.value);
+  else renderStatusUnavailable();
   if (graph.status === "fulfilled") {
     renderGraphSummary(graph.value);
     window.dispatchEvent(new CustomEvent("jarvis:graph", { detail: graph.value }));

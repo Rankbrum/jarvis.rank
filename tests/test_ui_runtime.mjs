@@ -299,6 +299,34 @@ async function testMemoryConfirmationIsOneShot() {
   assert.equal(elements.reactor.dataset.state, "IDLE");
 }
 
+async function testFailedMemorySaveRestoresRetryAndCancel() {
+  const retryRequest = deferred();
+  let requests = 0;
+  const { document, elements } = await loadApp(standardFetch({
+    "/api/remember": () => {
+      requests += 1;
+      return requests === 1
+        ? Promise.reject(Object.assign(new Error("disk unavailable"), { code: "MEMORY_UNAVAILABLE" }))
+        : retryRequest.promise;
+    },
+  }));
+  document.querySelectorAll("[data-action]").find((button) => button.dataset.action === "memory").click();
+  elements.input.value = "Priorizar vendas";
+  elements.form.dispatchEvent({ type: "submit", preventDefault() {}, target: elements.form });
+  const [confirm, cancel] = elements.card.querySelectorAll("button");
+  confirm.click();
+  await flush();
+  assert.equal(requests, 1);
+  assert.equal(confirm.disabled, false, "a failed save restores the retry control");
+  assert.equal(cancel.disabled, false, "a failed save restores the cancel control");
+  assert.match(elements.card.textContent, /Priorizar vendas/, "the pending fact remains visible for retry");
+  confirm.click();
+  assert.equal(requests, 2, "retry sends exactly one new write");
+  retryRequest.resolve(response({ spoken: "Salvei.", card: { type: "memory", fact: "Priorizar vendas" } }));
+  await flush();
+  assert.equal(elements.reactor.dataset.state, "IDLE");
+}
+
 async function testStartupFailuresAreVisibleAndRecover() {
   const { elements, window, app } = await loadApp(async () => { throw Object.assign(new Error("Servidor local indisponível"), { code: "LOCAL_OFFLINE" }); });
   assert.equal(elements.reactor.dataset.state, "ERROR");
@@ -313,7 +341,7 @@ async function testLateStartupFailureDoesNotClobberActiveChat() {
   const status = deferred();
   const graph = deferred();
   const chat = deferred();
-  const { app, elements } = await loadApp(async (path) => {
+  const { app, document, elements } = await loadApp(async (path) => {
     if (path === "/api/status") return status.promise;
     if (path === "/api/graph") return graph.promise;
     if (path === "/api/chat") return chat.promise;
@@ -325,6 +353,8 @@ async function testLateStartupFailureDoesNotClobberActiveChat() {
   graph.resolve(response({ nodes: [] }));
   await flush();
   assert.equal(elements.reactor.dataset.state, "THINKING", "late bootstrap failures must not replace active chat state");
+  assert.match(document.querySelector("[data-status]").textContent, /Não foi possível verificar o sistema local/, "late status failures still update the visible status region");
+  assert.match(document.querySelector("#mode-badge").textContent, /STATUS UNAVAILABLE/);
   chat.resolve(response({ spoken: "pronto", card: { type: "conversation", text: "pronto" } }));
   await request;
 }
@@ -354,6 +384,7 @@ async function testMobilePanelsAreExclusiveAndRestoreFocus() {
 await testReactorEventDetail();
 await testStaleRecoveryDoesNotResetNewRequest();
 await testMemoryConfirmationIsOneShot();
+await testFailedMemorySaveRestoresRetryAndCancel();
 await testStartupFailuresAreVisibleAndRecover();
 await testLateStartupFailureDoesNotClobberActiveChat();
 await testMobilePanelsAreExclusiveAndRestoreFocus();
