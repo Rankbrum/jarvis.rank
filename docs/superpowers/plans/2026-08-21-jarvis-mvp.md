@@ -141,7 +141,7 @@ class BootstrapTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar a falha esperada**
 
-Run: `python -m unittest tests.test_bootstrap -v`  
+Run: `python -m unittest tests.test_bootstrap -v`
 Expected: `ImportError` ou `AttributeError` porque `run.py`, `agent.data` e `agent.main` ainda não fornecem as interfaces.
 
 - [ ] **Step 3: Implementar o bootstrap mínimo e as configurações iniciais**
@@ -265,10 +265,10 @@ Criar `.gitignore` contendo `.env`, `__pycache__/`, `*.py[cod]`, `.coverage`, `m
 
 - [ ] **Step 4: Rodar o teste e verificar o status do servidor**
 
-Run: `python -m unittest tests.test_bootstrap -v`  
+Run: `python -m unittest tests.test_bootstrap -v`
 Expected: 2 testes `OK`.
 
-Run: `python run.py --port 8765`  
+Run: `python run.py --port 8765`
 Expected: processo permanece ativo e imprime `JARVIS disponível em http://127.0.0.1:8765`; encerrar com `Ctrl+C`.
 
 - [ ] **Step 5: Commitar a fundação**
@@ -327,7 +327,7 @@ class DemoDataTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar que as interfaces não existem**
 
-Run: `python -m unittest tests.test_data -v`  
+Run: `python -m unittest tests.test_data -v`
 Expected: falha de importação de `data.generate_demo` ou `DataGateway`.
 
 - [ ] **Step 3: Implementar gerador e gateway**
@@ -399,11 +399,11 @@ class DataGateway:
 
 - [ ] **Step 4: Gerar a fixture duas vezes e rodar os testes**
 
-Run: `python data/generate_demo.py`  
-Run: `git diff --exit-code -- data/demo/jarvis_demo.json` após uma segunda execução.  
+Run: `python data/generate_demo.py`
+Run: `git diff --exit-code -- data/demo/jarvis_demo.json` após uma segunda execução.
 Expected: nenhuma diferença após a segunda execução.
 
-Run: `python -m unittest tests.test_data -v`  
+Run: `python -m unittest tests.test_data -v`
 Expected: 3 testes `OK`.
 
 - [ ] **Step 5: Commitar o modo demo**
@@ -454,7 +454,7 @@ class SecurityTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar falha de importação**
 
-Run: `python -m unittest tests.test_security -v`  
+Run: `python -m unittest tests.test_security -v`
 Expected: `ModuleNotFoundError: agent.security`.
 
 - [ ] **Step 3: Implementar validação por caminho resolvido**
@@ -511,7 +511,7 @@ def configured_roots(self, config_path: Path | None = None) -> tuple[Path, ...]:
 
 - [ ] **Step 4: Rodar os testes de dados e segurança**
 
-Run: `python -m unittest tests.test_data tests.test_security -v`  
+Run: `python -m unittest tests.test_data tests.test_security -v`
 Expected: todos os testes `OK`.
 
 - [ ] **Step 5: Commitar a fronteira de segurança**
@@ -562,7 +562,7 @@ class MemoryTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar falha de importação**
 
-Run: `python -m unittest tests.test_memory -v`  
+Run: `python -m unittest tests.test_memory -v`
 Expected: `ModuleNotFoundError: agent.memory`.
 
 - [ ] **Step 3: Implementar armazenamento com criação exclusiva**
@@ -609,7 +609,7 @@ class MemoryStore:
 
 - [ ] **Step 4: Rodar o teste de memória**
 
-Run: `python -m unittest tests.test_memory -v`  
+Run: `python -m unittest tests.test_memory -v`
 Expected: 2 testes `OK`.
 
 - [ ] **Step 5: Commitar a memória**
@@ -668,7 +668,7 @@ class VaultTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar falha de importação**
 
-Run: `python -m unittest tests.test_vault -v`  
+Run: `python -m unittest tests.test_vault -v`
 Expected: `ModuleNotFoundError: agent.vault`.
 
 - [ ] **Step 3: Implementar o índice em memória com IDs estáveis**
@@ -778,7 +778,7 @@ Ao construir a aplicação, instanciar `VaultIndex(source_documents=gateway.docu
 
 - [ ] **Step 4: Rodar testes de segurança, dados e vault**
 
-Run: `python -m unittest tests.test_security tests.test_data tests.test_vault -v`  
+Run: `python -m unittest tests.test_security tests.test_data tests.test_vault -v`
 Expected: todos os testes `OK`.
 
 - [ ] **Step 5: Commitar o índice**
@@ -837,7 +837,7 @@ class ToolTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar falha de importação**
 
-Run: `python -m unittest tests.test_tools -v`  
+Run: `python -m unittest tests.test_tools -v`
 Expected: `ModuleNotFoundError: agent.tools`.
 
 - [ ] **Step 3: Implementar registro explícito de ferramentas**
@@ -899,7 +899,7 @@ class ToolRegistry:
 
 - [ ] **Step 4: Rodar testes de ferramentas e memória**
 
-Run: `python -m unittest tests.test_tools tests.test_memory -v`  
+Run: `python -m unittest tests.test_tools tests.test_memory -v`
 Expected: todos os testes `OK`.
 
 - [ ] **Step 5: Commitar as ferramentas**
@@ -961,7 +961,7 @@ class AgentTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar falha de importação**
 
-Run: `python -m unittest tests.test_agent -v`  
+Run: `python -m unittest tests.test_agent -v`
 Expected: falha porque `agent.agent` e `agent.router` ainda não existem.
 
 - [ ] **Step 3: Implementar tipos, roteamento e orquestração**
@@ -1060,7 +1060,7 @@ class JarvisAgent:
 
 - [ ] **Step 4: Rodar testes do agente e ferramentas**
 
-Run: `python -m unittest tests.test_agent tests.test_tools -v`  
+Run: `python -m unittest tests.test_agent tests.test_tools -v`
 Expected: todos os testes `OK`.
 
 - [ ] **Step 5: Commitar o núcleo conversacional**
@@ -1127,7 +1127,7 @@ class ApiTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar ausência do despachante**
 
-Run: `python -m unittest tests.test_api -v`  
+Run: `python -m unittest tests.test_api -v`
 Expected: falha de importação de `build_application`.
 
 - [ ] **Step 3: Implementar aplicação, respostas e rotas**
@@ -1295,11 +1295,11 @@ body { min-height: 100vh; margin: 0; display: grid; place-items: center; }
 
 - [ ] **Step 4: Rodar testes e verificar HTTP real**
 
-Run: `python -m unittest tests.test_api tests.test_bootstrap -v`  
+Run: `python -m unittest tests.test_api tests.test_bootstrap -v`
 Expected: todos os testes `OK`.
 
-Run em um terminal: `python run.py --port 8765`  
-Run em outro terminal: `curl.exe http://127.0.0.1:8765/api/status`  
+Run em um terminal: `python run.py --port 8765`
+Run em outro terminal: `curl.exe http://127.0.0.1:8765/api/status`
 Expected: JSON com `"ok": true`, `"demo_mode": true` e contagem de documentos.
 
 - [ ] **Step 5: Commitar a API**
@@ -1347,7 +1347,7 @@ class UiContractTests(unittest.TestCase):
 
 - [ ] **Step 2: Rodar o teste e confirmar ausência dos contratos**
 
-Run: `python -m unittest tests.test_ui_contract -v`  
+Run: `python -m unittest tests.test_ui_contract -v`
 Expected: falha porque `reactor.js` não existe e a página ainda não contém todas as regiões.
 
 - [ ] **Step 3: Implementar HTML semântico, estilos e máquina visual**
@@ -1461,10 +1461,10 @@ body { margin: 0; min-height: 100vh; overflow: hidden; background: var(--backgro
 
 - [ ] **Step 4: Rodar testes e inspeção manual da página**
 
-Run: `python -m unittest tests.test_ui_contract -v`  
+Run: `python -m unittest tests.test_ui_contract -v`
 Expected: 2 testes `OK`.
 
-Run: `python run.py --port 8765` e abrir `http://127.0.0.1:8765`.  
+Run: `python run.py --port 8765` e abrir `http://127.0.0.1:8765`.
 Expected: layout escuro em quatro regiões, badge de modo limitado, envio de texto, cartões de resposta e estados visíveis sem erros no console.
 
 - [ ] **Step 5: Commitar a interface textual**
@@ -1499,7 +1499,7 @@ git commit -m "feat: build JARVIS command interface"
 
 - [ ] **Step 2: Rodar o teste e confirmar ausência de `graph.js`**
 
-Run: `python -m unittest tests.test_ui_contract.UiContractTests.test_graph_uses_canvas_grid_collision_and_shortest_path -v`  
+Run: `python -m unittest tests.test_ui_contract.UiContractTests.test_graph_uses_canvas_grid_collision_and_shortest_path -v`
 Expected: erro de arquivo ausente.
 
 - [ ] **Step 3: Implementar física, desenho e interações**
@@ -1779,7 +1779,7 @@ Os métodos acima ajustam o Canvas por `devicePixelRatio`, limitam o zoom, difer
 
 - [ ] **Step 4: Rodar contratos e verificar interações no navegador**
 
-Run: `python -m unittest tests.test_ui_contract -v`  
+Run: `python -m unittest tests.test_ui_contract -v`
 Expected: todos os testes `OK`.
 
 Verificar manualmente pan, zoom, hover, foco, inspector, arraste, Shift+clique, filtros e resize. Para o teste de 1.000 nós, abrir o console e executar:
@@ -1876,7 +1876,7 @@ Adicionar ao `tests/test_api.py`:
 
 - [ ] **Step 2: Rodar o teste e confirmar falha de importação**
 
-Run: `python -m unittest tests.test_voice -v`  
+Run: `python -m unittest tests.test_voice -v`
 Expected: `ModuleNotFoundError: agent.voice`.
 
 - [ ] **Step 3: Implementar multipart e TTS com `urllib.request`**
@@ -1980,7 +1980,7 @@ if method == "POST" and path == "/api/speak":
 
 - [ ] **Step 4: Rodar testes simulados de voz e API**
 
-Run: `python -m unittest tests.test_voice tests.test_api -v`  
+Run: `python -m unittest tests.test_voice tests.test_api -v`
 Expected: todos os testes `OK`; nenhuma chamada de rede real.
 
 - [ ] **Step 5: Commitar o backend de voz**
@@ -2017,7 +2017,7 @@ git commit -m "feat: integrate ElevenLabs voice backend"
 
 - [ ] **Step 2: Rodar o teste e confirmar ausência de `voice.js`**
 
-Run: `python -m unittest tests.test_ui_contract.UiContractTests.test_voice_uses_media_recorder_real_levels_and_interval -v`  
+Run: `python -m unittest tests.test_ui_contract.UiContractTests.test_voice_uses_media_recorder_real_levels_and_interval -v`
 Expected: erro de arquivo ausente.
 
 - [ ] **Step 3: Implementar controlador de voz e integração de estado**
@@ -2143,7 +2143,7 @@ Mostrar barras de nível a partir de `onLevel`, nunca de números aleatórios.
 
 - [ ] **Step 4: Rodar contratos e teste manual com credencial válida configurada pelo usuário**
 
-Run: `python -m unittest tests.test_ui_contract tests.test_voice -v`  
+Run: `python -m unittest tests.test_ui_contract tests.test_voice -v`
 Expected: todos os testes `OK`.
 
 Teste manual sem chave: clicar no microfone. Expected: erro `ELEVENLABS_NOT_CONFIGURED`, sem segredo e sem travar a interface.
@@ -2208,7 +2208,7 @@ git commit -m "feat: add hands-free voice interaction"
 
 - [ ] **Step 2: Rodar a suíte e observar as falhas de documentação/status**
 
-Run: `python -m unittest discover -s tests -v`  
+Run: `python -m unittest discover -s tests -v`
 Expected: falhas até `build_status()` incluir integrações e a documentação/guardrails finais estarem alinhados.
 
 - [ ] **Step 3: Finalizar status, prompt, README e AGENTS**
@@ -2230,17 +2230,17 @@ O `agent/prompt.md` deve conter os guardrails absolutos: nunca enviar, nunca gas
 
 - [ ] **Step 4: Executar verificação automatizada, servidor e inspeção de Git**
 
-Run: `python data/generate_demo.py`  
-Run: `python -m unittest discover -s tests -v`  
+Run: `python data/generate_demo.py`
+Run: `python -m unittest discover -s tests -v`
 Expected: suíte completa `OK`.
 
-Run: `git grep -n -E "sk_[A-Za-z0-9]{20,}|ELEVENLABS_API_KEY=.+" -- ':!docs/superpowers/**'`  
+Run: `git grep -n -E "sk_[A-Za-z0-9]{20,}|ELEVENLABS_API_KEY=.+" -- ':!docs/superpowers/**'`
 Expected: nenhuma chave; `.env.example` pode conter somente `ELEVENLABS_API_KEY=` vazio.
 
-Run: `git status --short`  
+Run: `git status --short`
 Expected: apenas arquivos intencionais desta tarefa antes do commit.
 
-Run: `python run.py --port 8765` e abrir `http://127.0.0.1:8765`.  
+Run: `python run.py --port 8765` e abrir `http://127.0.0.1:8765`.
 Expected: primeira experiência mostra Demo ON, contagem de documentos, estado de voz, modelo não conectado, modo limitado e fonte demo; texto, ferramentas, grafo e estados funcionam.
 
 - [ ] **Step 5: Commitar documentação e guardrails**
@@ -2261,25 +2261,25 @@ git commit -m "docs: complete JARVIS operations guide"
 
 - [ ] **Step 1: Confirmar histórico e escopo da diferença**
 
-Run: `git status --short --branch`  
+Run: `git status --short --branch`
 Expected: working tree limpo na branch `codex/jarvis-mvp-design`.
 
-Run: `git diff --stat origin/main...HEAD`  
+Run: `git diff --stat origin/main...HEAD`
 Expected: somente arquivos do JARVIS, especificação, plano, testes e documentação.
 
 - [ ] **Step 2: Reexecutar a suíte a partir do estado limpo**
 
-Run: `python -m unittest discover -s tests -v`  
+Run: `python -m unittest discover -s tests -v`
 Expected: suíte completa `OK` sem depender de rede ou chave real.
 
 - [ ] **Step 3: Fazer smoke test local sem credenciais**
 
-Run: `python run.py --port 8765`  
+Run: `python run.py --port 8765`
 Expected: servidor inicia; `/api/status`, `/api/graph`, `/api/chat`, `/api/brief` e `/api/plan` respondem; `/api/listen` e `/api/speak` retornam `ELEVENLABS_NOT_CONFIGURED` de maneira segura.
 
 - [ ] **Step 4: Enviar a branch sem forçar histórico**
 
-Run: `git push origin codex/jarvis-mvp-design`  
+Run: `git push origin codex/jarvis-mvp-design`
 Expected: push normal concluído; nenhum force-push.
 
 - [ ] **Step 5: Registrar o resultado para revisão**
