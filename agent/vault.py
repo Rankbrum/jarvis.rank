@@ -65,15 +65,21 @@ class VaultIndex:
 
     def graph(self) -> dict[str, list[dict[str, object]]]:
         degrees = {node_id: 0 for node_id in self.nodes}
+        relationships = self._relationships()
         for source, target in self.edges:
             degrees[source] += 1
             degrees[target] += 1
-        nodes = [{**node, "degree": degrees[node_id]} for node_id, node in self.nodes.items()]
+        nodes = [
+            {**node, "degree": degrees[node_id], **relationships[node_id]}
+            for node_id, node in self.nodes.items()
+        ]
         edges = [{"source": source, "target": target} for source, target in sorted(self.edges)]
         return {"nodes": nodes, "edges": edges}
 
     def node(self, node_id: str) -> dict[str, object] | None:
-        return dict(self.nodes[node_id]) if node_id in self.nodes else None
+        if node_id not in self.nodes:
+            return None
+        return {**self.nodes[node_id], **self._relationships()[node_id]}
 
     def shortest_path(self, start: str, end: str) -> list[str]:
         if start not in self.nodes or end not in self.nodes:
@@ -136,3 +142,12 @@ class VaultIndex:
                 target_id = by_title.get(str(title).strip().casefold())
                 if target_id and target_id != source_id:
                     self.edges.add((source_id, target_id))
+
+    def _relationships(self) -> dict[str, dict[str, list[str]]]:
+        relationships = {
+            node_id: {"outgoing": [], "incoming": []} for node_id in self.nodes
+        }
+        for source, target in sorted(self.edges):
+            relationships[source]["outgoing"].append(target)
+            relationships[target]["incoming"].append(source)
+        return relationships

@@ -27,6 +27,26 @@ class VaultTests(unittest.TestCase):
             edge = graph["edges"][0]
             self.assertEqual(len(index.shortest_path(edge["source"], edge["target"])), 2)
 
+    def test_graph_and_node_expose_resolved_wikilink_relationship_ids(self):
+        """Returning raw wikilink titles leaves graph consumers unable to navigate nodes."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "alpha.md").write_text("[[Beta]]", encoding="utf-8")
+            (root / "beta.md").write_text("Sem links.", encoding="utf-8")
+            index = VaultIndex.from_roots([root])
+            index.build()
+
+            graph_nodes = {node["title"]: node for node in index.graph()["nodes"]}
+            alpha_id = graph_nodes["alpha"]["id"]
+            beta_id = graph_nodes["beta"]["id"]
+
+            self.assertEqual(graph_nodes["alpha"]["outgoing"], [beta_id])
+            self.assertEqual(graph_nodes["alpha"]["incoming"], [])
+            self.assertEqual(graph_nodes["beta"]["outgoing"], [])
+            self.assertEqual(graph_nodes["beta"]["incoming"], [alpha_id])
+            self.assertEqual(index.node(alpha_id)["outgoing"], [beta_id])
+            self.assertEqual(index.node(beta_id)["incoming"], [alpha_id])
+
     def test_pdf_is_indexed_with_explicit_unavailable_text_status(self):
         """Treating an unread PDF as extracted text would violate the API contract."""
         with tempfile.TemporaryDirectory() as tmp:
@@ -70,3 +90,14 @@ class VaultTests(unittest.TestCase):
         graph = index.graph()
         self.assertEqual(graph["nodes"][0]["id"], "demo-000")
         self.assertIn({"source": "demo-000", "target": "demo-003"}, graph["edges"])
+
+    def test_demo_nodes_expose_resolved_incoming_and_outgoing_ids(self):
+        """Demo graph edges must also be available directly from their endpoint nodes."""
+        with patch("agent.data.is_demo_mode", return_value=True):
+            index = DataGateway().vault_index()
+
+        graph_nodes = {node["id"]: node for node in index.graph()["nodes"]}
+        self.assertEqual(graph_nodes["demo-000"]["outgoing"], ["demo-003"])
+        self.assertEqual(graph_nodes["demo-000"]["incoming"], ["demo-027"])
+        self.assertEqual(index.node("demo-000")["outgoing"], ["demo-003"])
+        self.assertEqual(index.node("demo-000")["incoming"], ["demo-027"])
