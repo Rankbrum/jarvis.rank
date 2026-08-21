@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from agent.agent import JarvisAgent
-from agent.main import ApiApplication, build_application, create_server, make_handler
+from agent.main import ApiApplication, MAX_AUDIO_BODY, build_application, create_server, make_handler
 from agent.memory import MemoryStore
 from agent.tools import ToolRegistry, ToolResult
 
@@ -88,6 +88,34 @@ class ApiTests(unittest.TestCase):
             self.assertFalse(payload["ok"])
             self.assertEqual(payload["error"]["code"], code)
             self.assertTrue(payload["error"]["message"])
+
+    def test_voice_routes_degrade_without_configuration(self):
+        listen = self.app.dispatch("POST", "/api/listen", {"Content-Type": "audio/webm"}, b"audio")
+        speak = self.app.dispatch(
+            "POST",
+            "/api/speak",
+            {"Content-Type": "application/json"},
+            '{"text":"Olá"}'.encode("utf-8"),
+        )
+
+        self.assertEqual(listen.status, 503)
+        self.assertEqual(speak.status, 503)
+        self.assertEqual(json.loads(listen.body)["error"]["code"], "ELEVENLABS_NOT_CONFIGURED")
+
+    def test_voice_routes_validate_payloads_and_use_audio_limit(self):
+        unsupported = self.app.dispatch("POST", "/api/listen", {"Content-Type": "text/plain"}, b"audio")
+        oversized_audio = self.app.dispatch(
+            "POST", "/api/listen", {"Content-Type": "audio/webm"}, b"x" * (MAX_AUDIO_BODY + 1)
+        )
+        malformed = self.app.dispatch("POST", "/api/speak", {"Content-Type": "application/json"}, b"{")
+        bad_schema = self.app.dispatch("POST", "/api/speak", {"Content-Type": "application/json"}, b'[]')
+        blank = self.app.dispatch("POST", "/api/speak", {"Content-Type": "application/json"}, b'{"text":"  "}')
+
+        self.assertEqual(json.loads(unsupported.body)["error"]["code"], "UNSUPPORTED_AUDIO")
+        self.assertEqual(oversized_audio.status, 413)
+        self.assertEqual(json.loads(oversized_audio.body)["error"]["code"], "AUDIO_TOO_LARGE")
+        for response, code in ((malformed, "INVALID_JSON"), (bad_schema, "INVALID_SPEECH_TEXT"), (blank, "INVALID_SPEECH_TEXT")):
+            self.assertEqual(json.loads(response.body)["error"]["code"], code)
 
     def test_memory_endpoint_requires_confirmation(self):
         """Ignoring confirmed=false would write persistent user memory without consent."""
