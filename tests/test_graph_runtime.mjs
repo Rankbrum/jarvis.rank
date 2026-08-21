@@ -47,8 +47,9 @@ globalThis.requestAnimationFrame = (callback) => { const id = nextRaf++; rafs.se
 globalThis.cancelAnimationFrame = (id) => rafs.delete(id);
 
 const focused = [];
+const paths = [];
 const canvas = new FakeCanvas();
-const runtime = new graph.KnowledgeGraph(canvas, { onFocus: (node) => focused.push(node?.id) });
+const runtime = new graph.KnowledgeGraph(canvas, { onFocus: (node) => focused.push(node?.id), onPath: (path) => paths.push(path) });
 runtime.setData({
   nodes: [{ id: "a", title: "Alpha", type: "project", degree: 2 }, { id: "b", title: "Beta", type: "task", degree: 1 }, { id: "c", title: "Gamma", type: "lead", degree: 1 }],
   edges: [{ source: "a", target: "b" }, { source: "b", target: "c" }],
@@ -67,6 +68,13 @@ const alphaPointer = { clientX: 10 + runtime.transform.x + alpha.x * runtime.tra
 runtime.onPointerDown(alphaPointer);
 assert.deepEqual(focused, ["a"], "pointer selection focuses a node and invokes the inspector callback");
 runtime.onPointerUp(alphaPointer);
+const beta = runtime.nodeById.get("b");
+const betaPointer = { clientX: 10 + runtime.transform.x + beta.x * runtime.transform.scale, clientY: 20 + runtime.transform.y + beta.y * runtime.transform.scale, pointerId: 10, shiftKey: true };
+runtime.onPointerDown(betaPointer);
+assert.deepEqual(paths, [["a", "b"]], "Shift-pointer selection reports and stores the shortest path");
+assert.equal(runtime.pathIds.has("a") && runtime.pathIds.has("b"), true, "path state remains available for Canvas highlighting");
+runtime.onPointerMove(alphaPointer);
+assert.equal(runtime.hoveredId, "a", "hover updates the related-node render state");
 const panBefore = { ...runtime.transform };
 runtime.onPointerDown({ clientX: 20, clientY: 30, pointerId: 8, shiftKey: false });
 runtime.onPointerMove({ clientX: 55, clientY: 66, pointerId: 8 });
@@ -90,6 +98,44 @@ const reduced = new graph.KnowledgeGraph(new FakeCanvas());
 reduced.setData({ nodes: [{ id: "still", title: "Still", type: "note" }], edges: [] });
 assert.equal(reduced.physicsUntil, 0, "reduced motion suppresses decorative force simulation");
 reduced.destroy();
+
+const stressCanvas = new FakeCanvas();
+const stress = new graph.KnowledgeGraph(stressCanvas);
+const stressNodes = Array.from({ length: 1000 }, (_, index) => ({ id: `stress-${index}`, title: `Nó ${index}`, type: ["project", "lead", "task"][index % 3], degree: 2 }));
+const stressEdges = Array.from({ length: 1600 }, (_, index) => ({ source: `stress-${index % 1000}`, target: `stress-${(index * 17 + 11) % 1000}` }));
+stress.setData({ nodes: stressNodes, edges: stressEdges });
+stress.nodes[0].x = Number.NaN;
+const stressStarted = performance.now();
+for (let index = 0; index < 8; index += 1) stress.tick();
+const stressElapsed = performance.now() - stressStarted;
+assert.equal(stress.nodes.every((node) => Number.isFinite(node.x) && Number.isFinite(node.y) && Number.isFinite(node.vx) && Number.isFinite(node.vy) && Math.hypot(node.vx, node.vy) <= 16), true, "the exact 1,000-node/1,600-edge workload recovers unsafe coordinates and keeps motion bounded");
+assert.ok(stressElapsed < 2000, `the exact stress workload completes quickly (${stressElapsed.toFixed(1)}ms)`);
+stress.destroy();
+
+const originalDocument = globalThis.document;
+const lifecycleDocument = {
+  hidden: false,
+  listeners: new Map(),
+  addEventListener(type, handler) { this.listeners.set(type, handler); },
+  removeEventListener(type) { this.listeners.delete(type); },
+};
+globalThis.document = lifecycleDocument;
+const lifecycle = new graph.KnowledgeGraph(new FakeCanvas());
+lifecycle.setData({ nodes: [{ id: "life", title: "Life", type: "note" }], edges: [] });
+assert.equal(lifecycleDocument.listeners.has("visibilitychange"), true, "graph subscribes once to document visibility");
+lifecycle.suspend();
+assert.equal(lifecycle.suspended, true, "suspend cancels active rendering without destroying listeners");
+lifecycle.resume();
+assert.equal(lifecycle.suspended, false, "resume restarts a preserved graph instance");
+lifecycleDocument.hidden = true;
+lifecycle.onVisibilityChange();
+assert.equal(lifecycle.suspended, true, "hidden documents pause graph work");
+lifecycleDocument.hidden = false;
+lifecycle.onVisibilityChange();
+assert.equal(lifecycle.suspended, false, "visible documents resume graph work");
+lifecycle.destroy();
+assert.equal(lifecycleDocument.listeners.size, 0, "destroy removes the document listener after lifecycle recovery");
+globalThis.document = originalDocument;
 
 globalThis.requestAnimationFrame = originalRaf;
 globalThis.cancelAnimationFrame = originalCancelRaf;

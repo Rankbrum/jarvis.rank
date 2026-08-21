@@ -13,6 +13,8 @@ let recoveryTimer = null;
 let stateGeneration = 0;
 const panelOpeners = new Map();
 let graphView = null;
+let inspectorGeneration = 0;
+let inspectorController = null;
 
 export async function api(path, options = {}) {
   const response = await fetch(path, options);
@@ -230,6 +232,22 @@ function renderGraphSummary(graph) {
   const filterRoot = document.querySelector("[data-type-filters]");
   filterRoot.replaceChildren(...[...totals.entries()].sort().map(([type, count], index) => typeFilter(type, count, index)));
   renderTopHubs(nodes);
+  renderGraphNodeOptions(nodes);
+}
+
+function renderGraphNodeOptions(nodes) {
+  const select = document.querySelector("#graph-node-select");
+  if (!select) return;
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Escolha um nó";
+  const options = [...nodes].sort((left, right) => String(left?.title || left?.id).localeCompare(String(right?.title || right?.id))).map((node) => {
+    const option = document.createElement("option");
+    option.value = String(node.id);
+    option.textContent = `${node.title || node.id} · ${node.type || "item"}`;
+    return option;
+  });
+  select.replaceChildren(placeholder, ...options);
 }
 
 function typeFilter(type, count, index) {
@@ -266,6 +284,10 @@ function initialiseGraph() {
     onFocus: (node) => {
       if (node) window.dispatchEvent(new CustomEvent("jarvis:node", { detail: { id: node.id } }));
     },
+    onPath: (path) => {
+      const targetId = path.at(-1);
+      if (targetId) window.dispatchEvent(new CustomEvent("jarvis:node", { detail: { id: targetId } }));
+    },
   });
   window.addEventListener("jarvis:graph", (event) => graphView?.setData(event.detail || {}));
   window.addEventListener("jarvis:filter", (event) => {
@@ -280,12 +302,33 @@ function initialiseGraph() {
       graphView?.setLabelsVisible(visible);
     }
   });
-  window.addEventListener("pagehide", () => graphView?.destroy(), { once: true });
+  canvas.addEventListener("keydown", (event) => {
+    const pan = 48;
+    if (event.key === "ArrowLeft") graphView?.panBy(pan, 0);
+    else if (event.key === "ArrowRight") graphView?.panBy(-pan, 0);
+    else if (event.key === "ArrowUp") graphView?.panBy(0, pan);
+    else if (event.key === "ArrowDown") graphView?.panBy(0, -pan);
+    else if (event.key === "+" || event.key === "=") graphView?.zoomBy(1.18);
+    else if (event.key === "-") graphView?.zoomBy(1 / 1.18);
+    else if (event.key === "Home") graphView?.fitToView();
+    else return;
+    event.preventDefault();
+  });
+  window.addEventListener("pagehide", (event) => {
+    if (event.persisted) graphView?.suspend();
+    else graphView?.destroy();
+  });
+  window.addEventListener("pageshow", (event) => { if (event.persisted) graphView?.resume(); });
 }
 
 async function loadInspector(nodeId) {
+  inspectorGeneration += 1;
+  const generation = inspectorGeneration;
+  inspectorController?.abort();
+  inspectorController = typeof AbortController === "undefined" ? null : new AbortController();
   try {
-    const node = await api(`/api/node/${encodeURIComponent(nodeId)}`);
+    const node = await api(`/api/node/${encodeURIComponent(nodeId)}`, inspectorController ? { signal: inspectorController.signal } : {});
+    if (generation !== inspectorGeneration) return;
     const root = document.querySelector("[data-inspector-content]");
     root.replaceChildren();
     const title = document.createElement("p");
@@ -293,6 +336,7 @@ async function loadInspector(nodeId) {
     title.textContent = `${node.title || "Nó"} · ${node.type || "item"}`;
     root.append(title);
   } catch (error) {
+    if (generation !== inspectorGeneration || error?.name === "AbortError") return;
     presentError(error.code || "NODE_UNAVAILABLE", error.message);
   }
 }
@@ -353,6 +397,12 @@ function initialiseInteractions() {
   document.querySelectorAll("[data-graph-action]").forEach((button) => button.addEventListener("click", () => {
     if (button.dataset.graphAction === "labels") button.setAttribute("aria-pressed", String(button.getAttribute("aria-pressed") !== "true"));
     window.dispatchEvent(new CustomEvent("jarvis:graph-action", { detail: { action: button.dataset.graphAction } }));
+  }));
+  document.querySelectorAll("[data-graph-keyboard-action]").forEach((button) => button.addEventListener("click", () => {
+    const nodeId = document.querySelector("#graph-node-select")?.value;
+    if (!nodeId) return;
+    if (button.dataset.graphKeyboardAction === "focus") graphView?.centerOnNode(nodeId);
+    if (button.dataset.graphKeyboardAction === "path") graphView?.selectPathTo(nodeId);
   }));
   window.addEventListener("jarvis:node", (event) => { if (event.detail?.id) void loadInspector(event.detail.id); });
   document.addEventListener("keydown", (event) => {

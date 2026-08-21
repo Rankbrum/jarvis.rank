@@ -4,6 +4,11 @@ const TYPE_COLORS = {
 };
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 3.5;
+const MAX_COORDINATE = 100000;
+const MAX_ACCELERATION = 1.25;
+const MAX_VELOCITY = 12;
+const MAX_REPULSION = 0.55;
+const MAX_SPRING = 0.8;
 
 export class SpatialGrid {
   constructor(cellSize = 140) {
@@ -25,8 +30,8 @@ export class SpatialGrid {
     const cx = Math.floor(node.x / this.cellSize);
     const cy = Math.floor(node.y / this.cellSize);
     const result = [];
-    for (let x = cx - 1; x <= cx + 1; x += 1) {
-      for (let y = cy - 1; y <= cy + 1; y += 1) result.push(...(this.cells.get(`${x},${y}`) || []));
+    for (let offsetX = -1; offsetX <= 1; offsetX += 1) {
+      for (let offsetY = -1; offsetY <= 1; offsetY += 1) result.push(...(this.cells.get(`${cx + offsetX},${cy + offsetY}`) || []));
     }
     return result;
   }
@@ -75,6 +80,18 @@ function nodeDegree(node) {
   return Number(node.degree ?? node.connections?.length ?? ((node.incoming?.length || 0) + (node.outgoing?.length || 0)) ?? 1) || 1;
 }
 
+function isSafeNumber(value) {
+  return Number.isFinite(value) && Math.abs(value) <= MAX_COORDINATE;
+}
+
+function capVector(x, y, maximum) {
+  const magnitude = Math.hypot(x, y);
+  if (!Number.isFinite(magnitude)) return { x: 0, y: 0 };
+  if (magnitude <= maximum) return { x, y };
+  const scale = maximum / magnitude;
+  return { x: x * scale, y: y * scale };
+}
+
 export class KnowledgeGraph {
   constructor(canvas, callbacks = {}) {
     this.canvas = canvas;
@@ -95,6 +112,7 @@ export class KnowledgeGraph {
     this.relatedIds = new Set();
     this.drag = null;
     this.destroyed = false;
+    this.suspended = false;
     this.labelsVisible = true;
     this.physicsUntil = 0;
     this.settledFrames = 0;
@@ -154,6 +172,44 @@ export class KnowledgeGraph {
     this.wake(260);
   }
 
+  selectPathTo(id) {
+    if (!this.focusedId || !this.nodeById.has(id) || id === this.focusedId) return [];
+    const path = shortestPath(this.nodes, this.edges, this.focusedId, id);
+    this.pathIds = new Set(path);
+    this.updateRelated();
+    this.callbacks.onPath?.(path);
+    this.requestFrame();
+    return path;
+  }
+
+  centerOnNode(id) {
+    const node = this.nodeById.get(id);
+    if (!node) return false;
+    const rect = this.canvas.getBoundingClientRect();
+    this.transform.x = rect.width / 2 - node.x * this.transform.scale;
+    this.transform.y = rect.height / 2 - node.y * this.transform.scale;
+    this.focusNode(id);
+    this.requestFrame();
+    return true;
+  }
+
+  panBy(x, y) {
+    this.transform.x += x;
+    this.transform.y += y;
+    this.requestFrame();
+  }
+
+  zoomBy(factor) {
+    const rect = this.canvas.getBoundingClientRect();
+    const cursor = { x: rect.width / 2, y: rect.height / 2 };
+    const world = { x: (cursor.x - this.transform.x) / this.transform.scale, y: (cursor.y - this.transform.y) / this.transform.scale };
+    const nextScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, this.transform.scale * factor));
+    this.transform.x = cursor.x - world.x * nextScale;
+    this.transform.y = cursor.y - world.y * nextScale;
+    this.transform.scale = nextScale;
+    this.requestFrame();
+  }
+
   setLabelsVisible(visible) {
     this.labelsVisible = Boolean(visible);
     this.requestFrame();
@@ -202,7 +258,12 @@ export class KnowledgeGraph {
 
   tick() {
     if (!this.visibleNodes.length) return;
+    for (let index = 0; index < this.visibleNodes.length; index += 1) this.recoverNode(this.visibleNodes[index], index);
     this.grid.rebuild(this.visibleNodes);
+    for (const node of this.visibleNodes) {
+      node.ax = 0;
+      node.ay = 0;
+    }
     for (const node of this.visibleNodes) {
       for (const other of this.grid.nearby(node)) {
         if (node === other || String(node.id) >= String(other.id)) continue;
@@ -210,9 +271,12 @@ export class KnowledgeGraph {
         const dy = node.y - other.y;
         const distance2 = Math.max(64, dx * dx + dy * dy);
         if (distance2 > 19600) continue;
-        const force = 180 / distance2;
-        node.vx += dx * force; node.vy += dy * force;
-        other.vx -= dx * force; other.vy -= dy * force;
+        const distance = Math.sqrt(distance2);
+        const force = Math.min(MAX_REPULSION, 180 / distance2);
+        const xForce = (dx / distance) * force;
+        const yForce = (dy / distance) * force;
+        node.ax += xForce; node.ay += yForce;
+        other.ax -= xForce; other.ay -= yForce;
       }
     }
     for (const edge of this.visibleEdges) {
@@ -221,18 +285,35 @@ export class KnowledgeGraph {
       const dx = target.x - source.x;
       const dy = target.y - source.y;
       const distance = Math.max(1, Math.hypot(dx, dy));
-      const force = (distance - 90) * 0.0008;
-      source.vx += dx * force; source.vy += dy * force;
-      target.vx -= dx * force; target.vy -= dy * force;
+      const force = Math.max(-MAX_SPRING, Math.min(MAX_SPRING, (distance - 90) * 0.004));
+      const xForce = (dx / distance) * force;
+      const yForce = (dy / distance) * force;
+      source.ax += xForce; source.ay += yForce;
+      target.ax -= xForce; target.ay -= yForce;
     }
     let energy = 0;
-    for (const node of this.visibleNodes) {
-      node.vx = (node.vx - node.x * 0.00012) * 0.88;
-      node.vy = (node.vy - node.y * 0.00012) * 0.88;
+    for (let index = 0; index < this.visibleNodes.length; index += 1) {
+      const node = this.visibleNodes[index];
+      const acceleration = capVector(node.ax - node.x * 0.00012, node.ay - node.y * 0.00012, MAX_ACCELERATION);
+      const velocity = capVector((node.vx + acceleration.x) * 0.88, (node.vy + acceleration.y) * 0.88, MAX_VELOCITY);
+      node.vx = velocity.x;
+      node.vy = velocity.y;
       if (!node.dragged) { node.x += node.vx; node.y += node.vy; }
+      this.recoverNode(node, index);
       energy += Math.abs(node.vx) + Math.abs(node.vy);
     }
     this.settledFrames = energy / this.visibleNodes.length < 0.075 ? this.settledFrames + 1 : 0;
+  }
+
+  recoverNode(node, index) {
+    if (isSafeNumber(node.x) && isSafeNumber(node.y) && Number.isFinite(node.vx) && Number.isFinite(node.vy)) return;
+    const position = seededPosition(node.id || index, Math.max(900, Math.sqrt(Math.max(1, this.nodes.length)) * 130));
+    node.x = position.x;
+    node.y = position.y;
+    node.vx = 0;
+    node.vy = 0;
+    node.ax = 0;
+    node.ay = 0;
   }
 
   wake(duration = 300) {
@@ -247,7 +328,7 @@ export class KnowledgeGraph {
   }
 
   requestFrame() {
-    if (this.destroyed || this.frameId !== null || globalThis.document?.hidden) return;
+    if (this.destroyed || this.suspended || this.frameId !== null || globalThis.document?.hidden) return;
     const raf = globalThis.requestAnimationFrame;
     if (typeof raf === "function") this.frameId = raf((time) => this.frame(time));
     else this.draw(performance.now());
@@ -255,7 +336,7 @@ export class KnowledgeGraph {
 
   frame(time) {
     this.frameId = null;
-    if (this.destroyed || globalThis.document?.hidden) return;
+    if (this.destroyed || this.suspended || globalThis.document?.hidden) return;
     if (time < this.physicsUntil && this.settledFrames < 45) this.tick();
     this.draw(time);
     if (time < this.physicsUntil && this.settledFrames < 45) this.requestFrame();
@@ -302,11 +383,7 @@ export class KnowledgeGraph {
     this.canvas.setPointerCapture?.(event.pointerId);
     const node = this.hitTest(event);
     if (node && event.shiftKey && this.focusedId && node.id !== this.focusedId) {
-      const path = shortestPath(this.nodes, this.edges, this.focusedId, node.id);
-      this.pathIds = new Set(path);
-      this.updateRelated();
-      this.callbacks.onPath?.(path);
-      this.requestFrame();
+      this.selectPathTo(node.id);
       return;
     }
     if (node) {
@@ -349,7 +426,20 @@ export class KnowledgeGraph {
   }
 
   onVisibilityChange() {
-    if (!globalThis.document?.hidden) this.requestFrame();
+    if (globalThis.document?.hidden) this.suspend();
+    else this.resume();
+  }
+
+  suspend() {
+    this.suspended = true;
+    if (this.frameId !== null && typeof globalThis.cancelAnimationFrame === "function") globalThis.cancelAnimationFrame(this.frameId);
+    this.frameId = null;
+  }
+
+  resume() {
+    if (this.destroyed) return;
+    this.suspended = false;
+    this.resize();
   }
 
   draw() {
@@ -394,8 +484,7 @@ export class KnowledgeGraph {
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
-    if (this.frameId !== null && typeof globalThis.cancelAnimationFrame === "function") globalThis.cancelAnimationFrame(this.frameId);
-    this.frameId = null;
+    this.suspend();
     this.resizeObserver?.disconnect();
     this.canvas.removeEventListener("wheel", this.onWheel);
     this.canvas.removeEventListener("pointerdown", this.onPointerDown);

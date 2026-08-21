@@ -29,10 +29,17 @@
           <ol data-top-hubs><li><span class="hub-dot cyan"></span><span>Carregando rede</span><b>—</b></li></ol>
         </section>
         <p class="gesture-guide">ARRASTE · ROLE PARA ZOOM · SHIFT+CLIQUE PARA TRAÇAR</p>
+        <section class="graph-keyboard-controls" aria-labelledby="graph-keyboard-title">
+          <h3 id="graph-keyboard-title">CONTROLES DE TECLADO</h3>
+          <p id="graph-keyboard-help" class="panel-hint">Escolha um nó e use Focar. Escolha outro e use Traçar caminho. No grafo: setas movem, + e − ampliam, Home enquadra.</p>
+          <label for="graph-node-select">Nó do grafo</label>
+          <select id="graph-node-select" aria-describedby="graph-keyboard-help"><option value="">Carregando nós…</option></select>
+          <div><button type="button" class="icon-button" data-graph-keyboard-action="focus">Focar</button><button type="button" class="icon-button" data-graph-keyboard-action="path">Traçar caminho</button></div>
+        </section>
       </aside>
 
       <main id="graph-stage" aria-label="Grafo de conhecimento">
-        <canvas id="graph-canvas" aria-label="Visualização do grafo de conhecimento"></canvas>
+        <canvas id="graph-canvas" tabindex="0" aria-label="Visualização do grafo de conhecimento" aria-describedby="graph-keyboard-help" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight + - Home"></canvas>
         <div class="stage-overlay" aria-hidden="true"><span class="eyebrow">KNOWLEDGE FIELD</span><strong data-graph-count>Conectando dados locais</strong><span>O grafo aparece aqui quando os dados estiverem prontos.</span></div>
       </main>
 

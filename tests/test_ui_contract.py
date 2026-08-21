@@ -71,6 +71,17 @@ class UiContractTests(unittest.TestCase):
             with self.subTest(marker=marker):
                 self.assertIn(marker, source)
 
+    def test_graph_has_keyboard_equivalent_controls(self):
+        """Canvas-only pointer gestures must have semantic keyboard alternatives."""
+        html = (ROOT / "ui" / "index.html").read_text(encoding="utf-8")
+        source = (ROOT / "ui" / "app.js").read_text(encoding="utf-8")
+        for marker in ('id="graph-node-select"', 'data-graph-keyboard-action="focus"', 'data-graph-keyboard-action="path"', 'id="graph-keyboard-help"', 'tabindex="0"'):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, html)
+        for marker in ("renderGraphNodeOptions", "centerOnNode", "selectPathTo", "graph-keyboard-action"):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, source)
+
 
 if __name__ == "__main__":
     unittest.main()

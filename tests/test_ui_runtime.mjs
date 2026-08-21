@@ -45,6 +45,10 @@ class FakeElement {
   getAttribute(name) { return this.attributes[name] ?? null; }
   removeAttribute(name) { delete this.attributes[name]; }
   addEventListener(type, handler) { this.listeners.set(type, [...(this.listeners.get(type) || []), handler]); }
+  removeEventListener(type, handler) {
+    const remaining = (this.listeners.get(type) || []).filter((candidate) => candidate !== handler);
+    if (remaining.length) this.listeners.set(type, remaining); else this.listeners.delete(type);
+  }
   dispatchEvent(event) {
     event.target ||= this;
     for (const handler of this.listeners.get(event.type) || []) handler(event);
@@ -85,6 +89,14 @@ class FakeElement {
   }
 }
 
+class FakeCanvas extends FakeElement {
+  constructor() { super("canvas"); this.width = 0; this.height = 0; }
+  getContext() { return { setTransform() {}, clearRect() {}, beginPath() {}, moveTo() {}, lineTo() {}, stroke() {}, arc() {}, fill() {}, fillText() {}, measureText(text) { return { width: String(text).length * 7 }; } }; }
+  getBoundingClientRect() { return { left: 0, top: 0, width: 640, height: 420 }; }
+  setPointerCapture() {}
+  releasePointerCapture() {}
+}
+
 class FakeDocument {
   constructor() {
     this.documentElement = new FakeElement("html");
@@ -121,12 +133,17 @@ class FakeDocument {
     if (selector === "[data-action]") return this.groups.get("actions") || [];
     if (selector === "[data-panel-toggle], [data-panel-open]") return this.groups.get("panels") || [];
     if (selector === "[data-graph-action]") return this.groups.get("graphActions") || [];
+    if (selector === "[data-graph-keyboard-action]") return this.groups.get("graphKeyboardActions") || [];
     const matches = [...selector.matchAll(/data-panel-(?:toggle|open)="([^"]+)"/g)].map((match) => match[1]);
     if (matches.length) return (this.groups.get("panels") || []).filter((element) => matches.includes(element.dataset.panelToggle || element.dataset.panelOpen));
     return [];
   }
 
   addEventListener(type, handler) { this.listeners.set(type, [...(this.listeners.get(type) || []), handler]); }
+  removeEventListener(type, handler) {
+    const remaining = (this.listeners.get(type) || []).filter((candidate) => candidate !== handler);
+    if (remaining.length) this.listeners.set(type, remaining); else this.listeners.delete(type);
+  }
   dispatchEvent(event) {
     for (const handler of this.listeners.get(event.type) || []) handler(event);
     return true;
@@ -184,13 +201,15 @@ function buildEnvironment() {
   const form = element("#ask-form", "form");
   const input = element("#ask-input", "input");
   const reactor = element("#reactor", "section");
+  const canvas = document.register("#graph-canvas", new FakeCanvas());
+  canvas.ownerDocument = document;
   const reactorLabel = document.createElement("strong");
   reactorLabel.dataset.reactorLabel = "";
   reactor.append(reactorLabel);
   const inspector = element("#inspector", "aside");
   const filters = element("#filters", "aside");
-  for (const selector of ["#mode-badge", "[data-status]", "[data-status-data]", "[data-status-model]", "[data-status-voice]", "[data-graph-count]", "[data-type-filters]", "[data-top-hubs]"]) element(selector);
-  document.body.append(messages, card, detected, form, input, reactor, inspector, filters);
+  for (const selector of ["#mode-badge", "[data-status]", "[data-status-data]", "[data-status-model]", "[data-status-voice]", "[data-graph-count]", "[data-type-filters]", "[data-top-hubs]", "[data-inspector-content]", "#graph-node-select"]) element(selector);
+  document.body.append(messages, card, detected, form, input, reactor, canvas, inspector, filters);
 
   for (const action of ["brief", "plan", "memory"]) {
     const button = document.createElement("button");
@@ -211,8 +230,13 @@ function buildEnvironment() {
   const graphAction = document.createElement("button");
   graphAction.dataset.graphAction = "fit";
   document.register("[data-graph-action=fit]", graphAction, "graphActions");
+  for (const action of ["focus", "path"]) {
+    const button = document.createElement("button");
+    button.dataset.graphKeyboardAction = action;
+    document.register(`[data-graph-keyboard-action=${action}]`, button, "graphKeyboardActions");
+  }
   const window = new FakeWindow();
-  return { document, window, elements: { messages, card, detected, form, input, reactor, inspector, filters } };
+  return { document, window, elements: { messages, card, detected, form, input, reactor, inspector, filters, canvas } };
 }
 
 async function flush() {
@@ -381,6 +405,50 @@ async function testMobilePanelsAreExclusiveAndRestoreFocus() {
   assert.equal(document.activeElement, filtersOpen, "Escape returns focus to the active panel opener");
 }
 
+async function testLatestInspectorResponseWins() {
+  const first = deferred();
+  const second = deferred();
+  const { document, window } = await loadApp(standardFetch({
+    "/api/node/first": () => first.promise,
+    "/api/node/second": () => second.promise,
+  }));
+  window.dispatchEvent(new FakeCustomEvent("jarvis:node", { detail: { id: "first" } }));
+  window.dispatchEvent(new FakeCustomEvent("jarvis:node", { detail: { id: "second" } }));
+  second.resolve(response({ title: "Segundo", type: "task" }));
+  await flush();
+  first.resolve(response({ title: "Primeiro", type: "project" }));
+  await flush();
+  assert.match(document.querySelector("[data-inspector-content]").textContent, /Segundo/, "a stale inspector response cannot overwrite the latest selected node");
+}
+
+async function testKeyboardGraphControlsFocusTheSelectedNode() {
+  const { document } = await loadApp(standardFetch({
+    "/api/graph": () => response({ nodes: [{ id: "a", title: "Alpha", type: "project" }, { id: "b", title: "Beta", type: "task" }], edges: [{ source: "a", target: "b" }] }),
+    "/api/node/a": () => response({ title: "Alpha", type: "project" }),
+    "/api/node/b": () => response({ title: "Beta", type: "task" }),
+  }));
+  const select = document.querySelector("#graph-node-select");
+  select.value = "a";
+  document.querySelectorAll("[data-graph-keyboard-action]").find((button) => button.dataset.graphKeyboardAction === "focus").click();
+  await flush();
+  assert.match(document.querySelector("[data-inspector-content]").textContent, /Alpha/, "semantic keyboard focus chooses a graph node and synchronizes the inspector");
+  select.value = "b";
+  document.querySelectorAll("[data-graph-keyboard-action]").find((button) => button.dataset.graphKeyboardAction === "path").click();
+  await flush();
+  assert.match(document.querySelector("[data-inspector-content]").textContent, /Beta/, "semantic keyboard path selection synchronizes the inspector with its second node");
+}
+
+async function testPersistedPagehidePreservesTheGraph() {
+  const { window, elements } = await loadApp(standardFetch());
+  const listenerCount = elements.canvas.listeners.size;
+  window.dispatchEvent({ type: "pagehide", persisted: true });
+  assert.equal(elements.canvas.listeners.size, listenerCount, "bfcache pagehide suspends rather than destroys the graph");
+  window.dispatchEvent({ type: "pageshow", persisted: true });
+  assert.equal(elements.canvas.listeners.size, listenerCount, "bfcache pageshow resumes without duplicate Canvas listeners");
+  window.dispatchEvent({ type: "pagehide", persisted: false });
+  assert.equal(elements.canvas.listeners.has("wheel"), false, "a non-persisted pagehide cleans up graph pointer listeners while preserving the app keyboard handler");
+}
+
 await testReactorEventDetail();
 await testStaleRecoveryDoesNotResetNewRequest();
 await testMemoryConfirmationIsOneShot();
@@ -388,4 +456,7 @@ await testFailedMemorySaveRestoresRetryAndCancel();
 await testStartupFailuresAreVisibleAndRecover();
 await testLateStartupFailureDoesNotClobberActiveChat();
 await testMobilePanelsAreExclusiveAndRestoreFocus();
+await testLatestInspectorResponseWins();
+await testKeyboardGraphControlsFocusTheSelectedNode();
+await testPersistedPagehidePreservesTheGraph();
 console.log("UI runtime tests passed");
