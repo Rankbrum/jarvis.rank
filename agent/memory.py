@@ -15,8 +15,20 @@ def _slug(value: str) -> str:
 
 
 class MemoryStore:
-    def __init__(self, root: Path, today: Callable[[], str] | None = None) -> None:
-        self.root = root
+    def __init__(
+        self,
+        root: Path | None = None,
+        today: Callable[[], str] | None = None,
+        *,
+        application_root: Path | None = None,
+    ) -> None:
+        self.application_root = (application_root or Path(__file__).parents[1]).absolute()
+        expected_root = (self.application_root / "memory").absolute()
+        self.root = (root or expected_root).absolute()
+        if self.root != expected_root:
+            raise ValueError("Memory destination must be the application's memory directory")
+        if self.root.is_symlink():
+            raise ValueError("Memory destination must not be a symlink")
         self.today = today or (lambda: date.today().isoformat())
 
     def remember(self, fact: str, why: str, category: str, source: str, confirmed: bool) -> Path:
