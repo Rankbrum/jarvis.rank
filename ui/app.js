@@ -277,16 +277,37 @@ function renderTopHubs(nodes) {
   }));
 }
 
+function announceGraph(message) {
+  const feedback = document.querySelector("#graph-feedback");
+  if (feedback) feedback.textContent = message;
+}
+
+function graphNodeTitle(id) {
+  const node = graphView?.nodeById.get(id);
+  return node?.title || id || "nó selecionado";
+}
+
 function initialiseGraph() {
   const canvas = document.querySelector("#graph-canvas");
   if (!canvas) return;
   graphView = new KnowledgeGraph(canvas, {
     onFocus: (node) => {
-      if (node) window.dispatchEvent(new CustomEvent("jarvis:node", { detail: { id: node.id } }));
+      if (!node) {
+        announceGraph("Não foi possível focar o nó selecionado.");
+        return;
+      }
+      announceGraph(`Foco em ${node.title || node.id}.`);
+      window.dispatchEvent(new CustomEvent("jarvis:node", { detail: { id: node.id } }));
     },
-    onPath: (path) => {
-      const targetId = path.at(-1);
-      if (targetId) window.dispatchEvent(new CustomEvent("jarvis:node", { detail: { id: targetId } }));
+    onPath: (path, targetId, status) => {
+      if (!path.length) {
+        if (status === "missing-focus") announceGraph("Selecione primeiro um nó para traçar um caminho.");
+        else announceGraph(`Sem caminho entre ${graphNodeTitle(graphView?.focusedId)} e ${graphNodeTitle(targetId)}.`);
+        return;
+      }
+      const route = path.map((id) => graphNodeTitle(id)).join(" → ");
+      announceGraph(`Caminho com ${path.length} nós: ${route}.`);
+      window.dispatchEvent(new CustomEvent("jarvis:node", { detail: { id: targetId } }));
     },
   });
   window.addEventListener("jarvis:graph", (event) => graphView?.setData(event.detail || {}));
@@ -400,8 +421,8 @@ function initialiseInteractions() {
   }));
   document.querySelectorAll("[data-graph-keyboard-action]").forEach((button) => button.addEventListener("click", () => {
     const nodeId = document.querySelector("#graph-node-select")?.value;
-    if (!nodeId) return;
-    if (button.dataset.graphKeyboardAction === "focus") graphView?.centerOnNode(nodeId);
+    if (!nodeId) { announceGraph("Escolha um nó do grafo primeiro."); return; }
+    if (button.dataset.graphKeyboardAction === "focus" && !graphView?.centerOnNode(nodeId)) announceGraph("Não foi possível focar o nó selecionado.");
     if (button.dataset.graphKeyboardAction === "path") graphView?.selectPathTo(nodeId);
   }));
   window.addEventListener("jarvis:node", (event) => { if (event.detail?.id) void loadInspector(event.detail.id); });

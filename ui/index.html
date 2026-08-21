@@ -23,7 +23,7 @@
 
       <aside id="inspector" class="panel" aria-label="Inspetor">
         <div class="panel-heading"><h2>INSPECTOR</h2><button type="button" class="panel-toggle" data-panel-toggle="inspector" aria-controls="inspector" aria-expanded="false">Fechar</button></div>
-        <div data-inspector-content><p class="panel-hint">Selecione um nó para abrir o contexto. Use Shift + clique em outro nó para traçar uma relação.</p></div>
+        <div data-inspector-content aria-live="polite" aria-atomic="true"><p class="panel-hint">Selecione um nó para abrir o contexto. Use Shift + clique em outro nó para traçar uma relação.</p></div>
         <section class="hub-list" aria-labelledby="hubs-title">
           <h3 id="hubs-title">TOP HUBS</h3>
           <ol data-top-hubs><li><span class="hub-dot cyan"></span><span>Carregando rede</span><b>—</b></li></ol>
@@ -40,6 +40,7 @@
 
       <main id="graph-stage" aria-label="Grafo de conhecimento">
         <canvas id="graph-canvas" tabindex="0" aria-label="Visualização do grafo de conhecimento" aria-describedby="graph-keyboard-help" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight + - Home"></canvas>
+        <p id="graph-feedback" class="sr-only" role="status" aria-live="polite" aria-atomic="true">Grafo pronto para seleção.</p>
         <div class="stage-overlay" aria-hidden="true"><span class="eyebrow">KNOWLEDGE FIELD</span><strong data-graph-count>Conectando dados locais</strong><span>O grafo aparece aqui quando os dados estiverem prontos.</span></div>
       </main>
 

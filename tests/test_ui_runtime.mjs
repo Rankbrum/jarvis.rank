@@ -90,8 +90,8 @@ class FakeElement {
 }
 
 class FakeCanvas extends FakeElement {
-  constructor() { super("canvas"); this.width = 0; this.height = 0; }
-  getContext() { return { setTransform() {}, clearRect() {}, beginPath() {}, moveTo() {}, lineTo() {}, stroke() {}, arc() {}, fill() {}, fillText() {}, measureText(text) { return { width: String(text).length * 7 }; } }; }
+  constructor() { super("canvas"); this.width = 0; this.height = 0; this.context = { transforms: [], setTransform(...values) { this.transforms.push(values); }, clearRect() {}, beginPath() {}, moveTo() {}, lineTo() {}, stroke() {}, arc() {}, fill() {}, fillText() {}, measureText(text) { return { width: String(text).length * 7 }; } }; }
+  getContext() { return this.context; }
   getBoundingClientRect() { return { left: 0, top: 0, width: 640, height: 420 }; }
   setPointerCapture() {}
   releasePointerCapture() {}
@@ -208,7 +208,7 @@ function buildEnvironment() {
   reactor.append(reactorLabel);
   const inspector = element("#inspector", "aside");
   const filters = element("#filters", "aside");
-  for (const selector of ["#mode-badge", "[data-status]", "[data-status-data]", "[data-status-model]", "[data-status-voice]", "[data-graph-count]", "[data-type-filters]", "[data-top-hubs]", "[data-inspector-content]", "#graph-node-select"]) element(selector);
+  for (const selector of ["#mode-badge", "[data-status]", "[data-status-data]", "[data-status-model]", "[data-status-voice]", "[data-graph-count]", "[data-type-filters]", "[data-top-hubs]", "[data-inspector-content]", "#graph-node-select", "#graph-feedback"]) element(selector);
   document.body.append(messages, card, detected, form, input, reactor, canvas, inspector, filters);
 
   for (const action of ["brief", "plan", "memory"]) {
@@ -423,7 +423,7 @@ async function testLatestInspectorResponseWins() {
 
 async function testKeyboardGraphControlsFocusTheSelectedNode() {
   const { document } = await loadApp(standardFetch({
-    "/api/graph": () => response({ nodes: [{ id: "a", title: "Alpha", type: "project" }, { id: "b", title: "Beta", type: "task" }], edges: [{ source: "a", target: "b" }] }),
+    "/api/graph": () => response({ nodes: [{ id: "a", title: "Alpha", type: "project" }, { id: "b", title: "Beta", type: "task" }, { id: "c", title: "Gamma", type: "lead" }], edges: [{ source: "a", target: "b" }] }),
     "/api/node/a": () => response({ title: "Alpha", type: "project" }),
     "/api/node/b": () => response({ title: "Beta", type: "task" }),
   }));
@@ -436,6 +436,27 @@ async function testKeyboardGraphControlsFocusTheSelectedNode() {
   document.querySelectorAll("[data-graph-keyboard-action]").find((button) => button.dataset.graphKeyboardAction === "path").click();
   await flush();
   assert.match(document.querySelector("[data-inspector-content]").textContent, /Beta/, "semantic keyboard path selection synchronizes the inspector with its second node");
+  assert.match(document.querySelector("#graph-feedback").textContent, /Caminho com 2 nós: Alpha → Beta/, "path feedback announces the complete titled route outside the Canvas");
+  select.value = "c";
+  document.querySelectorAll("[data-graph-keyboard-action]").find((button) => button.dataset.graphKeyboardAction === "path").click();
+  assert.match(document.querySelector("#graph-feedback").textContent, /Sem caminho entre Alpha e Gamma/, "unreachable path feedback is announced outside the Canvas");
+  select.value = "missing";
+  document.querySelectorAll("[data-graph-keyboard-action]").find((button) => button.dataset.graphKeyboardAction === "focus").click();
+  assert.match(document.querySelector("#graph-feedback").textContent, /Não foi possível focar/, "failed focus feedback is announced outside the Canvas");
+  const canvas = document.querySelector("#graph-canvas");
+  const pressCanvasKey = (key) => {
+    let prevented = false;
+    canvas.dispatchEvent({ type: "keydown", key, preventDefault() { prevented = true; } });
+    assert.equal(prevented, true, `${key} is handled by the actual Canvas keyboard listener`);
+    return canvas.context.transforms.at(-1);
+  };
+  const beforePan = canvas.context.transforms.at(-1);
+  const afterPan = pressCanvasKey("ArrowLeft");
+  assert.notDeepEqual(afterPan, beforePan, "Canvas ArrowLeft pans the rendered graph");
+  const afterZoom = pressCanvasKey("+");
+  assert.notEqual(afterZoom[0], afterPan[0], "Canvas plus key changes graph zoom");
+  const afterFit = pressCanvasKey("Home");
+  assert.notEqual(afterFit[0], afterZoom[0], "Canvas Home restores the fitted zoom");
 }
 
 async function testPersistedPagehidePreservesTheGraph() {

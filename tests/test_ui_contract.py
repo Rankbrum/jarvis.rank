@@ -82,6 +82,17 @@ class UiContractTests(unittest.TestCase):
             with self.subTest(marker=marker):
                 self.assertIn(marker, source)
 
+    def test_graph_exposes_live_feedback_for_focus_and_paths(self):
+        """Keyboard and pointer graph actions must have a semantic result outside the Canvas."""
+        html = (ROOT / "ui" / "index.html").read_text(encoding="utf-8")
+        source = (ROOT / "ui" / "app.js").read_text(encoding="utf-8")
+        for marker in ('id="graph-feedback"', 'role="status"', 'aria-live="polite"', 'data-inspector-content aria-live="polite"'):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, html)
+        for marker in ("announceGraph", "Caminho com", "Sem caminho", "Não foi possível focar"):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, source)
+
 
 if __name__ == "__main__":
     unittest.main()

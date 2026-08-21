@@ -22,13 +22,14 @@ const labels = graph.resolveLabelCollisions([
 assert.deepEqual(labels.map((label) => label.id), ["high", "free"], "higher-priority overlapping labels win deterministically");
 
 class FakeContext {
-  setTransform() {} clearRect() {} beginPath() {} moveTo() {} lineTo() {} stroke() {} arc() {} fill() {} fillText() {}
+  constructor() { this.transforms = []; }
+  setTransform(...values) { this.transforms.push(values); } clearRect() {} beginPath() {} moveTo() {} lineTo() {} stroke() {} arc() {} fill() {} fillText() {}
   measureText(text) { return { width: String(text).length * 7 }; }
 }
 
 class FakeCanvas {
-  constructor() { this.listeners = new Map(); this.style = {}; this.width = 0; this.height = 0; this.captures = []; }
-  getContext() { return new FakeContext(); }
+  constructor() { this.listeners = new Map(); this.style = {}; this.width = 0; this.height = 0; this.captures = []; this.context = new FakeContext(); }
+  getContext() { return this.context; }
   getBoundingClientRect() { return { left: 10, top: 20, width: 400, height: 300 }; }
   addEventListener(type, handler) { this.listeners.set(type, handler); }
   removeEventListener(type) { this.listeners.delete(type); }
@@ -41,10 +42,20 @@ const originalCancelRaf = globalThis.cancelAnimationFrame;
 const originalDpr = globalThis.devicePixelRatio;
 const originalMatchMedia = globalThis.matchMedia;
 const rafs = new Map();
+const cancelledRafs = [];
 let nextRaf = 1;
 globalThis.devicePixelRatio = 2;
 globalThis.requestAnimationFrame = (callback) => { const id = nextRaf++; rafs.set(id, callback); return id; };
-globalThis.cancelAnimationFrame = (id) => rafs.delete(id);
+globalThis.cancelAnimationFrame = (id) => { cancelledRafs.push(id); rafs.delete(id); };
+
+function runQueuedFrame(time) {
+  const next = rafs.entries().next().value;
+  assert.ok(next, "expected a queued animation frame");
+  const [id, callback] = next;
+  rafs.delete(id);
+  callback(time);
+  return id;
+}
 
 const focused = [];
 const paths = [];
@@ -56,6 +67,8 @@ runtime.setData({
 });
 assert.equal(canvas.width, 800, "resize applies devicePixelRatio to Canvas width");
 assert.equal(canvas.height, 600, "resize applies devicePixelRatio to Canvas height");
+runtime.draw();
+assert.deepEqual(canvas.context.transforms.at(-1), [2 * runtime.transform.scale, 0, 0, 2 * runtime.transform.scale, 2 * runtime.transform.x, 2 * runtime.transform.y], "Canvas draw transform keeps DPR, scale, and translation aligned");
 const initial = { ...runtime.transform };
 runtime.onWheel({ clientX: 210, clientY: 170, deltaY: -100000, preventDefault() {} });
 assert.equal(runtime.transform.scale, 3.5, "zoom is bounded at its maximum");
@@ -98,6 +111,7 @@ const reduced = new graph.KnowledgeGraph(new FakeCanvas());
 reduced.setData({ nodes: [{ id: "still", title: "Still", type: "note" }], edges: [] });
 assert.equal(reduced.physicsUntil, 0, "reduced motion suppresses decorative force simulation");
 reduced.destroy();
+globalThis.matchMedia = originalMatchMedia;
 
 const stressCanvas = new FakeCanvas();
 const stress = new graph.KnowledgeGraph(stressCanvas);
@@ -111,6 +125,25 @@ const stressElapsed = performance.now() - stressStarted;
 assert.equal(stress.nodes.every((node) => Number.isFinite(node.x) && Number.isFinite(node.y) && Number.isFinite(node.vx) && Number.isFinite(node.vy) && Math.hypot(node.vx, node.vy) <= 16), true, "the exact 1,000-node/1,600-edge workload recovers unsafe coordinates and keeps motion bounded");
 assert.ok(stressElapsed < 2000, `the exact stress workload completes quickly (${stressElapsed.toFixed(1)}ms)`);
 stress.destroy();
+
+rafs.clear();
+const cooling = new graph.KnowledgeGraph(new FakeCanvas());
+cooling.setData({ nodes: [{ id: "cool", title: "Cooling", type: "note" }], edges: [] });
+runQueuedFrame(0);
+assert.ok(rafs.size > 0, "an active simulation schedules its next RAF");
+cooling.physicsUntil = 0;
+runQueuedFrame(1);
+assert.equal(rafs.size, 0, "RAF scheduling stops after the simulation cools");
+cooling.requestFrame();
+const suspendedFrame = rafs.keys().next().value;
+cooling.suspend();
+assert.equal(rafs.has(suspendedFrame), false, "suspend removes a queued RAF");
+assert.equal(cancelledRafs.includes(suspendedFrame), true, "suspend cancels the queued RAF");
+cooling.resume();
+const destroyedFrame = rafs.keys().next().value;
+cooling.destroy();
+assert.equal(rafs.has(destroyedFrame), false, "destroy stops queued graph rendering");
+assert.equal(cancelledRafs.includes(destroyedFrame), true, "destroy cancels the queued RAF");
 
 const originalDocument = globalThis.document;
 const lifecycleDocument = {

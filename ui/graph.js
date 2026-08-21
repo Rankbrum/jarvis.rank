@@ -173,11 +173,14 @@ export class KnowledgeGraph {
   }
 
   selectPathTo(id) {
-    if (!this.focusedId || !this.nodeById.has(id) || id === this.focusedId) return [];
+    if (!this.focusedId || !this.nodeById.has(id) || id === this.focusedId) {
+      this.callbacks.onPath?.([], id, this.focusedId ? "invalid-target" : "missing-focus");
+      return [];
+    }
     const path = shortestPath(this.nodes, this.edges, this.focusedId, id);
     this.pathIds = new Set(path);
     this.updateRelated();
-    this.callbacks.onPath?.(path);
+    this.callbacks.onPath?.(path, id, path.length ? "found" : "not-found");
     this.requestFrame();
     return path;
   }
