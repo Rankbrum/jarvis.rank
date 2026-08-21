@@ -31,7 +31,11 @@ class ToolTests(unittest.TestCase):
         application_root = Path(tmp)
         return ToolRegistry(
             self.index,
-            MemoryStore(application_root / "memory", application_root=application_root),
+            MemoryStore(
+                application_root / "memory",
+                application_root=application_root,
+                today=lambda: "2026-08-21",
+            ),
         )
 
     def test_search_names_real_sources_and_card_is_detailed(self):

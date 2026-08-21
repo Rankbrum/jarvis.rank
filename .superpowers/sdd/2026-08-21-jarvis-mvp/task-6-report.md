@@ -62,3 +62,29 @@ Result: clean; no whitespace errors.
 ## Concerns
 
 No known concerns within Task 6 scope. The registry remains deliberately local and deterministic; it does not add external integrations or write memory without explicit confirmation.
+
+## Fix Round 1
+
+Addressed the date-dependent test fixture identified in review. `tests/test_tools.py` now injects `today=lambda: "2026-08-21"` into its `MemoryStore` helper; production behavior is unchanged. The deferred minor about nameless filenames was not addressed.
+
+Exact verification commands and results:
+
+```text
+C:\Users\renan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m unittest tests.test_tools tests.test_memory -v
+```
+
+Result: `Ran 7 tests ... OK`.
+
+```text
+C:\Users\renan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m unittest discover -s tests -v
+```
+
+Result: `Ran 23 tests ... OK`.
+
+```text
+git diff --check
+```
+
+Result: clean; no whitespace errors.
+
+Commit: `fix: make Task 6 memory test date deterministic`
