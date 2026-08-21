@@ -1,0 +1,20 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, sans-serif;
+  background: #030407;
+  color: #e8edf4;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+}
+
+#bootstrap {
+  padding: 2rem;
+  border: 1px solid rgba(151, 175, 210, .14);
+  border-radius: 1rem;
+  background: rgba(12, 15, 22, .82);
+}
