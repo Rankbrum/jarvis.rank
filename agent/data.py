@@ -22,3 +22,17 @@ class DataGateway:
 
     def documents(self) -> list[dict[str, object]]:
         return list(self.load_dataset()["documents"])
+
+    def configured_roots(self, config_path: Path | None = None) -> tuple[Path, ...]:
+        if is_demo_mode():
+            return ()
+        path = config_path or Path(__file__).parents[1] / "config" / "sources.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        roots: list[Path] = []
+        for source in payload.get("sources", []):
+            if source.get("enabled") is True and source.get("read_only") is True:
+                candidate = Path(str(source["path"])).expanduser().resolve(strict=True)
+                if not candidate.is_dir():
+                    raise RuntimeError(f"DATA_SOURCE_UNAVAILABLE: {candidate}")
+                roots.append(candidate)
+        return tuple(roots)
