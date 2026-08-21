@@ -1,0 +1,23 @@
+import tempfile
+import unittest
+from pathlib import Path
+
+from agent.memory import MemoryConfirmationRequired, MemoryStore
+
+
+class MemoryTests(unittest.TestCase):
+    def test_memory_requires_explicit_confirmation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = MemoryStore(Path(tmp))
+            with self.assertRaises(MemoryConfirmationRequired):
+                store.remember("Priorizar vendas", "Impacta receita", "priority", "user", confirmed=False)
+            self.assertEqual(list(Path(tmp).glob("*.md")), [])
+
+    def test_confirmed_memory_uses_expected_markdown(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = MemoryStore(Path(tmp), today=lambda: "2026-08-21")
+            path = store.remember("Priorizar RANKBRUM ONE AI", "Projeto central", "priority", "user", True)
+            text = path.read_text(encoding="utf-8")
+            self.assertEqual(path.name, "2026-08-21_priorizar-rankbrum-one-ai.md")
+            self.assertIn("## Fact\n\nPriorizar RANKBRUM ONE AI", text)
+            self.assertIn("## Why it matters\n\nProjeto central", text)
