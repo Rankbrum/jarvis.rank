@@ -1,4 +1,4 @@
-import { ASSISTANT_STATES, setAssistantState } from "./reactor.js";
+import { ASSISTANT_STATES, getAssistantState, setAssistantState } from "./reactor.js";
 
 const CATEGORY_COLORS = ["#43c7f4", "#f6b83f", "#a48bff", "#44cf86", "#ef78ad", "#fa9947", "#d8e0e8"];
 const messagesElement = document.querySelector("#messages");
@@ -7,6 +7,10 @@ const detectedTextElement = document.querySelector("#detected-text");
 const form = document.querySelector("#ask-form");
 const input = document.querySelector("#ask-input");
 let memoryMode = false;
+let pendingMemory = null;
+let recoveryTimer = null;
+let stateGeneration = 0;
+const panelOpeners = new Map();
 
 export async function api(path, options = {}) {
   const response = await fetch(path, options);
@@ -51,8 +55,25 @@ function clearError() {
   delete detectedTextElement.dataset.error;
 }
 
-function returnToIdleAfterError() {
-  window.setTimeout(() => setAssistantState(ASSISTANT_STATES.IDLE), 1800);
+function setState(nextState) {
+  stateGeneration += 1;
+  if (recoveryTimer !== null) {
+    window.clearTimeout(recoveryTimer);
+    recoveryTimer = null;
+  }
+  setAssistantState(nextState);
+  return stateGeneration;
+}
+
+function presentError(code, message) {
+  showError(code, message);
+  const errorGeneration = setState(ASSISTANT_STATES.ERROR);
+  recoveryTimer = window.setTimeout(() => {
+    recoveryTimer = null;
+    if (stateGeneration === errorGeneration && getAssistantState() === ASSISTANT_STATES.ERROR) {
+      setState(ASSISTANT_STATES.IDLE);
+    }
+  }, 1800);
 }
 
 export function renderCard(card) {
@@ -89,36 +110,32 @@ function describeCard(card) {
 export async function submitText(text) {
   const message = String(text || "").trim();
   if (!message) return null;
-  setAssistantState(ASSISTANT_STATES.THINKING);
+  setState(ASSISTANT_STATES.THINKING);
   clearError();
   addMessage("user", message);
   try {
     const data = await api("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: message }) });
     addMessage("assistant", data.spoken);
     renderCard(data.card);
-    setAssistantState(ASSISTANT_STATES.IDLE);
+    setState(ASSISTANT_STATES.IDLE);
     return data;
   } catch (error) {
-    showError(error.code || "REQUEST_FAILED", error.message);
-    setAssistantState(ASSISTANT_STATES.ERROR);
-    returnToIdleAfterError();
+    presentError(error.code || "REQUEST_FAILED", error.message);
     throw error;
   }
 }
 
 async function submitAction(label, path) {
-  setAssistantState(ASSISTANT_STATES.THINKING);
+  setState(ASSISTANT_STATES.THINKING);
   clearError();
   addMessage("user", label);
   try {
     const data = await api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
     addMessage("assistant", data.spoken);
     renderCard(data.card);
-    setAssistantState(ASSISTANT_STATES.IDLE);
+    setState(ASSISTANT_STATES.IDLE);
   } catch (error) {
-    showError(error.code || "REQUEST_FAILED", error.message);
-    setAssistantState(ASSISTANT_STATES.ERROR);
-    returnToIdleAfterError();
+    presentError(error.code || "REQUEST_FAILED", error.message);
   }
 }
 
@@ -129,6 +146,7 @@ function stageMemoryConfirmation(text) {
     return;
   }
   memoryMode = false;
+  pendingMemory = { fact, submitting: false };
   input.placeholder = "Pergunte ao JARVIS";
   detectedTextElement.textContent = "Revise e confirme antes de gravar a memória.";
   cardElement.replaceChildren();
@@ -141,11 +159,12 @@ function stageMemoryConfirmation(text) {
   const confirm = document.createElement("button");
   confirm.type = "button";
   confirm.textContent = "Confirmar e salvar";
-  confirm.addEventListener("click", () => void submitMemory(fact));
+  confirm.addEventListener("click", () => void submitMemory());
   const cancel = document.createElement("button");
   cancel.type = "button";
   cancel.textContent = "Cancelar";
   cancel.addEventListener("click", () => {
+    pendingMemory = null;
     cardElement.replaceChildren();
     detectedTextElement.textContent = "Memória descartada.";
   });
@@ -153,19 +172,23 @@ function stageMemoryConfirmation(text) {
   cardElement.append(panel);
 }
 
-async function submitMemory(fact) {
-  setAssistantState(ASSISTANT_STATES.THINKING);
+async function submitMemory() {
+  if (!pendingMemory || pendingMemory.submitting) return;
+  pendingMemory.submitting = true;
+  const { fact } = pendingMemory;
+  cardElement.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+  setState(ASSISTANT_STATES.THINKING);
   clearError();
   addMessage("user", `Salvar memória: ${fact}`);
   try {
     const data = await api("/api/remember", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fact, confirmed: true }) });
     addMessage("assistant", data.spoken);
     renderCard(data.card);
-    setAssistantState(ASSISTANT_STATES.IDLE);
+    pendingMemory = null;
+    setState(ASSISTANT_STATES.IDLE);
   } catch (error) {
-    showError(error.code || "REQUEST_FAILED", error.message);
-    setAssistantState(ASSISTANT_STATES.ERROR);
-    returnToIdleAfterError();
+    pendingMemory = null;
+    presentError(error.code || "REQUEST_FAILED", error.message);
   }
 }
 
@@ -231,7 +254,31 @@ async function loadInspector(nodeId) {
     title.textContent = `${node.title || "Nó"} · ${node.type || "item"}`;
     root.append(title);
   } catch (error) {
-    showError(error.code || "NODE_UNAVAILABLE", error.message);
+    presentError(error.code || "NODE_UNAVAILABLE", error.message);
+  }
+}
+
+function panelControls(panelId) {
+  return document.querySelectorAll(`[data-panel-toggle="${panelId}"], [data-panel-open="${panelId}"]`);
+}
+
+function setPanelOpen(panelId, isOpen, { opener = null, restoreFocus = true } = {}) {
+  const panel = document.querySelector(`#${panelId}`);
+  if (!panel) return;
+  if (isOpen) {
+    for (const otherId of ["inspector", "filters"]) {
+      if (otherId !== panelId) setPanelOpen(otherId, false, { restoreFocus: false });
+    }
+    panelOpeners.set(panelId, opener || document.activeElement);
+  }
+  panel.dataset.open = String(isOpen);
+  panelControls(panelId).forEach((control) => {
+    control.setAttribute("aria-expanded", String(isOpen));
+    if (control.dataset.panelToggle) control.textContent = isOpen ? "Fechar" : "Abrir";
+  });
+  if (!isOpen && restoreFocus) {
+    const panelOpener = panelOpeners.get(panelId);
+    if (panelOpener) panelOpener.focus();
   }
 }
 
@@ -255,11 +302,7 @@ function initialiseInteractions() {
     const panelId = button.dataset.panelToggle || button.dataset.panelOpen;
     const panel = document.querySelector(`#${panelId}`);
     const willOpen = panel.dataset.open !== "true";
-    panel.dataset.open = String(willOpen);
-    document.querySelectorAll(`[data-panel-toggle="${panelId}"], [data-panel-open="${panelId}"]`).forEach((control) => {
-      control.setAttribute("aria-expanded", String(willOpen));
-      if (control.dataset.panelToggle) control.textContent = willOpen ? "Fechar" : "Abrir";
-    });
+    setPanelOpen(panelId, willOpen, { opener: button.dataset.panelOpen ? button : null, restoreFocus: !willOpen });
   }));
   document.querySelector("[data-type-filters]").addEventListener("click", (event) => {
     const filter = event.target.closest(".type-filter");
@@ -272,18 +315,39 @@ function initialiseInteractions() {
     window.dispatchEvent(new CustomEvent("jarvis:graph-action", { detail: { action: button.dataset.graphAction } }));
   }));
   window.addEventListener("jarvis:node", (event) => { if (event.detail?.id) void loadInspector(event.detail.id); });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    for (const panelId of ["inspector", "filters"]) {
+      const panel = document.querySelector(`#${panelId}`);
+      if (panel?.dataset.open === "true") {
+        event.preventDefault();
+        setPanelOpen(panelId, false);
+        break;
+      }
+    }
+  });
 }
 
 async function initialise() {
   initialiseInteractions();
-  setAssistantState(ASSISTANT_STATES.IDLE);
+  setState(ASSISTANT_STATES.IDLE);
+  const startupGeneration = stateGeneration;
   const [status, graph] = await Promise.allSettled([api("/api/status"), api("/api/graph")]);
   if (status.status === "fulfilled") renderStatus(status.value);
-  else showError(status.reason.code || "STATUS_UNAVAILABLE", status.reason.message);
   if (graph.status === "fulfilled") {
     renderGraphSummary(graph.value);
     window.dispatchEvent(new CustomEvent("jarvis:graph", { detail: graph.value }));
-  } else document.querySelector("[data-graph-count]").textContent = "GRAFO INDISPONÍVEL";
+  } else {
+    document.querySelector("[data-graph-count]").textContent = "GRAFO INDISPONÍVEL";
+  }
+  if (stateGeneration !== startupGeneration) return;
+  if (status.status === "rejected" && graph.status === "rejected") {
+    presentError("STARTUP_UNAVAILABLE", "O sistema e o grafo local não responderam. Verifique o servidor e recarregue a página.");
+  } else if (status.status === "rejected") {
+    presentError("STATUS_UNAVAILABLE", "Não foi possível verificar o sistema local. Verifique o servidor e recarregue a página.");
+  } else if (graph.status === "rejected") {
+    presentError("GRAPH_UNAVAILABLE", "O grafo local não respondeu. Você pode tentar novamente recarregando a página.");
+  }
 }
 
 void initialise();
