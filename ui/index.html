@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#030407">
+    <title>JARVIS — Command Center</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div id="jarvis-shell">
+      <header id="topbar">
+        <a class="brand" href="#graph-stage" aria-label="JARVIS, ir ao grafo de conhecimento"><span class="brand-dot" aria-hidden="true"></span><strong>JARVIS</strong></a>
+        <span id="mode-badge" role="status">INICIANDO</span>
+        <p id="system-readout" data-status>Verificando sistema local…</p>
+        <div class="stage-tools" aria-label="Controles do grafo">
+          <button type="button" class="icon-button mobile-panel-open" data-panel-open="inspector" aria-controls="inspector" aria-expanded="false">Info</button>
+          <button type="button" class="icon-button mobile-panel-open" data-panel-open="filters" aria-controls="filters" aria-expanded="false">Filter</button>
+          <button type="button" class="icon-button" data-graph-action="fit" title="Enquadrar grafo">◎ <span>Fit</span></button>
+          <button type="button" class="icon-button" data-graph-action="labels" aria-pressed="true" title="Alternar rótulos">Aa</button>
+        </div>
+      </header>
+
+      <aside id="inspector" class="panel" aria-label="Inspetor">
+        <div class="panel-heading"><h2>INSPECTOR</h2><button type="button" class="panel-toggle" data-panel-toggle="inspector" aria-controls="inspector" aria-expanded="false">Fechar</button></div>
+        <div data-inspector-content aria-live="polite" aria-atomic="true"><p class="panel-hint">Selecione um nó para abrir o contexto. Use Shift + clique em outro nó para traçar uma relação.</p></div>
+        <section class="hub-list" aria-labelledby="hubs-title">
+          <h3 id="hubs-title">TOP HUBS</h3>
+          <ol data-top-hubs><li><span class="hub-dot cyan"></span><span>Carregando rede</span><b>—</b></li></ol>
+        </section>
+        <p class="gesture-guide">ARRASTE · ROLE PARA ZOOM · SHIFT+CLIQUE PARA TRAÇAR</p>
+        <section class="graph-keyboard-controls" aria-labelledby="graph-keyboard-title">
+          <h3 id="graph-keyboard-title">CONTROLES DE TECLADO</h3>
+          <p id="graph-keyboard-help" class="panel-hint">Escolha um nó e use Focar. Escolha outro e use Traçar caminho. No grafo: setas movem, + e − ampliam, Home enquadra.</p>
+          <label for="graph-node-select">Nó do grafo</label>
+          <select id="graph-node-select" aria-describedby="graph-keyboard-help"><option value="">Carregando nós…</option></select>
+          <div><button type="button" class="icon-button" data-graph-keyboard-action="focus">Focar</button><button type="button" class="icon-button" data-graph-keyboard-action="path">Traçar caminho</button></div>
+        </section>
+      </aside>
+
+      <main id="graph-stage" aria-label="Grafo de conhecimento">
+        <canvas id="graph-canvas" tabindex="0" aria-label="Visualização do grafo de conhecimento" aria-describedby="graph-keyboard-help" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight + - Home"></canvas>
+        <p id="graph-feedback" class="sr-only" role="status" aria-live="polite" aria-atomic="true">Grafo pronto para seleção.</p>
+        <div class="stage-overlay" aria-hidden="true"><span class="eyebrow">KNOWLEDGE FIELD</span><strong data-graph-count>Conectando dados locais</strong><span>O grafo aparece aqui quando os dados estiverem prontos.</span></div>
+      </main>
+
+      <aside id="filters" class="panel" aria-label="Filtros e status">
+        <div class="panel-heading"><h2>FILTER</h2><button type="button" class="panel-toggle" data-panel-toggle="filters" aria-controls="filters" aria-expanded="false">Fechar</button></div>
+        <div data-type-filters class="type-filters" aria-label="Filtrar tipos de conhecimento"><p class="panel-hint">Carregando categorias…</p></div>
+        <section class="system-status" aria-labelledby="status-title">
+          <h3 id="status-title">SYSTEM STATUS</h3>
+          <dl><div><dt>DATA</dt><dd data-status-data>—</dd></div><div><dt>MODEL</dt><dd data-status-model>—</dd></div><div><dt>VOICE</dt><dd data-status-voice>—</dd></div></dl>
+        </section>
+        <section id="reactor" data-state="IDLE" aria-label="Estado do assistente" aria-live="polite"><span class="reactor-orbit" aria-hidden="true"></span><span class="reactor-core" aria-hidden="true"></span><span class="reactor-label"><span class="eyebrow">ASSISTANT</span><strong data-reactor-label>IDLE</strong></span></section>
+      </aside>
+
+      <section id="conversation" class="panel" aria-label="Conversa com JARVIS" aria-live="polite">
+        <div class="conversation-heading"><h2>CONVERSATION</h2><p id="detected-text" aria-live="polite">Texto é processado localmente.</p></div>
+        <div id="messages" aria-label="Mensagens"></div>
+        <div id="response-card" aria-label="Resposta estruturada"></div>
+      </section>
+
+      <form id="ask-form" aria-label="Enviar uma pergunta ao JARVIS">
+        <label class="sr-only" for="ask-input">Pergunte ao JARVIS</label><span class="input-prompt" aria-hidden="true">›</span>
+        <input id="ask-input" name="question" autocomplete="off" maxlength="4000" placeholder="Pergunte ao JARVIS" required>
+        <button type="submit" class="send-button">Enviar <span aria-hidden="true">↗</span></button>
+        <div class="voice-actions" aria-label="Controles de voz"><button type="button" id="mic-button" class="icon-button" aria-label="Iniciar microfone" title="Iniciar microfone">◉ <span>Mic</span></button><button type="button" id="mute-button" class="icon-button" aria-label="Silenciar voz" aria-pressed="false" title="Silenciar voz">⌁ <span>Som</span></button></div>
+        <div class="quick-actions" aria-label="Ações rápidas"><button type="button" data-action="brief">Brief Me</button><button type="button" data-action="plan">Plan Day</button><button type="button" data-action="memory">Memory</button></div>
+      </form>
+    </div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "conversation_turns": 10,
+  "max_plan_items": 5,
+  "max_source_file_bytes": 2097152,
+  "language": "pt-BR",
+  "communication_style": ["direto", "informal", "proativo", "orientado_a_resultados"]
+}

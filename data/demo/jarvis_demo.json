@@ -1,0 +1,1014 @@
+{
+  "documents": [
+    {
+      "id": "demo-000",
+      "title": "Project 1",
+      "filename": "project-1.md",
+      "path": "demo/project/1.md",
+      "type": "project",
+      "preview": "Registro fictício 1 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-01T09:00:00Z",
+      "tags": [
+        "project",
+        "demo"
+      ],
+      "priority": 2,
+      "revenue_impact": 57,
+      "customer_impact": 57,
+      "urgency": 47
+    },
+    {
+      "id": "demo-001",
+      "title": "Lead 2",
+      "filename": "lead-2.md",
+      "path": "demo/lead/2.md",
+      "type": "lead",
+      "preview": "Registro fictício 2 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-02T09:00:00Z",
+      "tags": [
+        "lead",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 34,
+      "customer_impact": 43,
+      "urgency": 68
+    },
+    {
+      "id": "demo-002",
+      "title": "Task 3",
+      "filename": "task-3.md",
+      "path": "demo/task/3.md",
+      "type": "task",
+      "preview": "Registro fictício 3 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-03T09:00:00Z",
+      "tags": [
+        "task",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 57,
+      "customer_impact": 85,
+      "urgency": 79
+    },
+    {
+      "id": "demo-003",
+      "title": "Meeting 4",
+      "filename": "meeting-4.md",
+      "path": "demo/meeting/4.md",
+      "type": "meeting",
+      "preview": "Registro fictício 4 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-04T09:00:00Z",
+      "tags": [
+        "meeting",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 49,
+      "customer_impact": 76,
+      "urgency": 36
+    },
+    {
+      "id": "demo-004",
+      "title": "Proposal 5",
+      "filename": "proposal-5.md",
+      "path": "demo/proposal/5.md",
+      "type": "proposal",
+      "preview": "Registro fictício 5 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-05T09:00:00Z",
+      "tags": [
+        "proposal",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 14,
+      "customer_impact": 88,
+      "urgency": 9
+    },
+    {
+      "id": "demo-005",
+      "title": "Note 6",
+      "filename": "note-6.md",
+      "path": "demo/note/6.md",
+      "type": "note",
+      "preview": "Registro fictício 6 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-06T09:00:00Z",
+      "tags": [
+        "note",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 13,
+      "customer_impact": 94,
+      "urgency": 0
+    },
+    {
+      "id": "demo-006",
+      "title": "Concept 7",
+      "filename": "concept-7.md",
+      "path": "demo/concept/7.md",
+      "type": "concept",
+      "preview": "Registro fictício 7 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-07T09:00:00Z",
+      "tags": [
+        "concept",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 43,
+      "customer_impact": 36,
+      "urgency": 74
+    },
+    {
+      "id": "demo-007",
+      "title": "Invoice 8",
+      "filename": "invoice-8.md",
+      "path": "demo/invoice/8.md",
+      "type": "invoice",
+      "preview": "Registro fictício 8 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-08T09:00:00Z",
+      "tags": [
+        "invoice",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 13,
+      "customer_impact": 80,
+      "urgency": 85
+    },
+    {
+      "id": "demo-008",
+      "title": "Project 9",
+      "filename": "project-9.md",
+      "path": "demo/project/9.md",
+      "type": "project",
+      "preview": "Registro fictício 9 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-09T09:00:00Z",
+      "tags": [
+        "project",
+        "demo"
+      ],
+      "priority": 2,
+      "revenue_impact": 39,
+      "customer_impact": 64,
+      "urgency": 16
+    },
+    {
+      "id": "demo-009",
+      "title": "Lead 10",
+      "filename": "lead-10.md",
+      "path": "demo/lead/10.md",
+      "type": "lead",
+      "preview": "Registro fictício 10 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-10T09:00:00Z",
+      "tags": [
+        "lead",
+        "demo"
+      ],
+      "priority": 4,
+      "revenue_impact": 75,
+      "customer_impact": 4,
+      "urgency": 44
+    },
+    {
+      "id": "demo-010",
+      "title": "Task 11",
+      "filename": "task-11.md",
+      "path": "demo/task/11.md",
+      "type": "task",
+      "preview": "Registro fictício 11 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-11T09:00:00Z",
+      "tags": [
+        "task",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 18,
+      "customer_impact": 73,
+      "urgency": 67
+    },
+    {
+      "id": "demo-011",
+      "title": "Meeting 12",
+      "filename": "meeting-12.md",
+      "path": "demo/meeting/12.md",
+      "type": "meeting",
+      "preview": "Registro fictício 12 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-12T09:00:00Z",
+      "tags": [
+        "meeting",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 69,
+      "customer_impact": 69,
+      "urgency": 84
+    },
+    {
+      "id": "demo-012",
+      "title": "Proposal 13",
+      "filename": "proposal-13.md",
+      "path": "demo/proposal/13.md",
+      "type": "proposal",
+      "preview": "Registro fictício 13 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-13T09:00:00Z",
+      "tags": [
+        "proposal",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 99,
+      "customer_impact": 88,
+      "urgency": 63
+    },
+    {
+      "id": "demo-013",
+      "title": "Note 14",
+      "filename": "note-14.md",
+      "path": "demo/note/14.md",
+      "type": "note",
+      "preview": "Registro fictício 14 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-14T09:00:00Z",
+      "tags": [
+        "note",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 70,
+      "customer_impact": 57,
+      "urgency": 21
+    },
+    {
+      "id": "demo-014",
+      "title": "Concept 15",
+      "filename": "concept-15.md",
+      "path": "demo/concept/15.md",
+      "type": "concept",
+      "preview": "Registro fictício 15 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-15T09:00:00Z",
+      "tags": [
+        "concept",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 56,
+      "customer_impact": 32,
+      "urgency": 27
+    },
+    {
+      "id": "demo-015",
+      "title": "Invoice 16",
+      "filename": "invoice-16.md",
+      "path": "demo/invoice/16.md",
+      "type": "invoice",
+      "preview": "Registro fictício 16 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-16T09:00:00Z",
+      "tags": [
+        "invoice",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 49,
+      "customer_impact": 11,
+      "urgency": 48
+    },
+    {
+      "id": "demo-016",
+      "title": "Project 17",
+      "filename": "project-17.md",
+      "path": "demo/project/17.md",
+      "type": "project",
+      "preview": "Registro fictício 17 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-17T09:00:00Z",
+      "tags": [
+        "project",
+        "demo"
+      ],
+      "priority": 2,
+      "revenue_impact": 61,
+      "customer_impact": 95,
+      "urgency": 8
+    },
+    {
+      "id": "demo-017",
+      "title": "Lead 18",
+      "filename": "lead-18.md",
+      "path": "demo/lead/18.md",
+      "type": "lead",
+      "preview": "Registro fictício 18 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-18T09:00:00Z",
+      "tags": [
+        "lead",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 50,
+      "customer_impact": 71,
+      "urgency": 40
+    },
+    {
+      "id": "demo-018",
+      "title": "Task 19",
+      "filename": "task-19.md",
+      "path": "demo/task/19.md",
+      "type": "task",
+      "preview": "Registro fictício 19 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-19T09:00:00Z",
+      "tags": [
+        "task",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 24,
+      "customer_impact": 12,
+      "urgency": 22
+    },
+    {
+      "id": "demo-019",
+      "title": "Meeting 20",
+      "filename": "meeting-20.md",
+      "path": "demo/meeting/20.md",
+      "type": "meeting",
+      "preview": "Registro fictício 20 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-20T09:00:00Z",
+      "tags": [
+        "meeting",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 70,
+      "customer_impact": 74,
+      "urgency": 4
+    },
+    {
+      "id": "demo-020",
+      "title": "Proposal 21",
+      "filename": "proposal-21.md",
+      "path": "demo/proposal/21.md",
+      "type": "proposal",
+      "preview": "Registro fictício 21 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-01T09:00:00Z",
+      "tags": [
+        "proposal",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 60,
+      "customer_impact": 75,
+      "urgency": 33
+    },
+    {
+      "id": "demo-021",
+      "title": "Note 22",
+      "filename": "note-22.md",
+      "path": "demo/note/22.md",
+      "type": "note",
+      "preview": "Registro fictício 22 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-02T09:00:00Z",
+      "tags": [
+        "note",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 1,
+      "customer_impact": 21,
+      "urgency": 89
+    },
+    {
+      "id": "demo-022",
+      "title": "Concept 23",
+      "filename": "concept-23.md",
+      "path": "demo/concept/23.md",
+      "type": "concept",
+      "preview": "Registro fictício 23 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-03T09:00:00Z",
+      "tags": [
+        "concept",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 82,
+      "customer_impact": 63,
+      "urgency": 49
+    },
+    {
+      "id": "demo-023",
+      "title": "Invoice 24",
+      "filename": "invoice-24.md",
+      "path": "demo/invoice/24.md",
+      "type": "invoice",
+      "preview": "Registro fictício 24 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-04T09:00:00Z",
+      "tags": [
+        "invoice",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 83,
+      "customer_impact": 84,
+      "urgency": 63
+    },
+    {
+      "id": "demo-024",
+      "title": "Project 25",
+      "filename": "project-25.md",
+      "path": "demo/project/25.md",
+      "type": "project",
+      "preview": "Registro fictício 25 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-05T09:00:00Z",
+      "tags": [
+        "project",
+        "demo"
+      ],
+      "priority": 4,
+      "revenue_impact": 54,
+      "customer_impact": 51,
+      "urgency": 56
+    },
+    {
+      "id": "demo-025",
+      "title": "Lead 26",
+      "filename": "lead-26.md",
+      "path": "demo/lead/26.md",
+      "type": "lead",
+      "preview": "Registro fictício 26 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-06T09:00:00Z",
+      "tags": [
+        "lead",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 75,
+      "customer_impact": 86,
+      "urgency": 81
+    },
+    {
+      "id": "demo-026",
+      "title": "Task 27",
+      "filename": "task-27.md",
+      "path": "demo/task/27.md",
+      "type": "task",
+      "preview": "Registro fictício 27 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-07T09:00:00Z",
+      "tags": [
+        "task",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 45,
+      "customer_impact": 86,
+      "urgency": 69
+    },
+    {
+      "id": "demo-027",
+      "title": "Meeting 28",
+      "filename": "meeting-28.md",
+      "path": "demo/meeting/28.md",
+      "type": "meeting",
+      "preview": "Registro fictício 28 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-08T09:00:00Z",
+      "tags": [
+        "meeting",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 64,
+      "customer_impact": 6,
+      "urgency": 78
+    },
+    {
+      "id": "demo-028",
+      "title": "Proposal 29",
+      "filename": "proposal-29.md",
+      "path": "demo/proposal/29.md",
+      "type": "proposal",
+      "preview": "Registro fictício 29 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-09T09:00:00Z",
+      "tags": [
+        "proposal",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 47,
+      "customer_impact": 36,
+      "urgency": 74
+    },
+    {
+      "id": "demo-029",
+      "title": "Note 30",
+      "filename": "note-30.md",
+      "path": "demo/note/30.md",
+      "type": "note",
+      "preview": "Registro fictício 30 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-10T09:00:00Z",
+      "tags": [
+        "note",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 89,
+      "customer_impact": 55,
+      "urgency": 19
+    },
+    {
+      "id": "demo-030",
+      "title": "Concept 31",
+      "filename": "concept-31.md",
+      "path": "demo/concept/31.md",
+      "type": "concept",
+      "preview": "Registro fictício 31 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-11T09:00:00Z",
+      "tags": [
+        "concept",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 90,
+      "customer_impact": 84,
+      "urgency": 62
+    },
+    {
+      "id": "demo-031",
+      "title": "Invoice 32",
+      "filename": "invoice-32.md",
+      "path": "demo/invoice/32.md",
+      "type": "invoice",
+      "preview": "Registro fictício 32 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-12T09:00:00Z",
+      "tags": [
+        "invoice",
+        "demo"
+      ],
+      "priority": 4,
+      "revenue_impact": 1,
+      "customer_impact": 35,
+      "urgency": 62
+    },
+    {
+      "id": "demo-032",
+      "title": "Project 33",
+      "filename": "project-33.md",
+      "path": "demo/project/33.md",
+      "type": "project",
+      "preview": "Registro fictício 33 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-13T09:00:00Z",
+      "tags": [
+        "project",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 66,
+      "customer_impact": 81,
+      "urgency": 61
+    },
+    {
+      "id": "demo-033",
+      "title": "Lead 34",
+      "filename": "lead-34.md",
+      "path": "demo/lead/34.md",
+      "type": "lead",
+      "preview": "Registro fictício 34 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-14T09:00:00Z",
+      "tags": [
+        "lead",
+        "demo"
+      ],
+      "priority": 2,
+      "revenue_impact": 17,
+      "customer_impact": 41,
+      "urgency": 10
+    },
+    {
+      "id": "demo-034",
+      "title": "Task 35",
+      "filename": "task-35.md",
+      "path": "demo/task/35.md",
+      "type": "task",
+      "preview": "Registro fictício 35 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-15T09:00:00Z",
+      "tags": [
+        "task",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 34,
+      "customer_impact": 38,
+      "urgency": 54
+    },
+    {
+      "id": "demo-035",
+      "title": "Meeting 36",
+      "filename": "meeting-36.md",
+      "path": "demo/meeting/36.md",
+      "type": "meeting",
+      "preview": "Registro fictício 36 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-16T09:00:00Z",
+      "tags": [
+        "meeting",
+        "demo"
+      ],
+      "priority": 2,
+      "revenue_impact": 71,
+      "customer_impact": 75,
+      "urgency": 56
+    },
+    {
+      "id": "demo-036",
+      "title": "Proposal 37",
+      "filename": "proposal-37.md",
+      "path": "demo/proposal/37.md",
+      "type": "proposal",
+      "preview": "Registro fictício 37 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-17T09:00:00Z",
+      "tags": [
+        "proposal",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 21,
+      "customer_impact": 11,
+      "urgency": 59
+    },
+    {
+      "id": "demo-037",
+      "title": "Note 38",
+      "filename": "note-38.md",
+      "path": "demo/note/38.md",
+      "type": "note",
+      "preview": "Registro fictício 38 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-18T09:00:00Z",
+      "tags": [
+        "note",
+        "demo"
+      ],
+      "priority": 1,
+      "revenue_impact": 43,
+      "customer_impact": 12,
+      "urgency": 49
+    },
+    {
+      "id": "demo-038",
+      "title": "Concept 39",
+      "filename": "concept-39.md",
+      "path": "demo/concept/39.md",
+      "type": "concept",
+      "preview": "Registro fictício 39 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-19T09:00:00Z",
+      "tags": [
+        "concept",
+        "demo"
+      ],
+      "priority": 5,
+      "revenue_impact": 95,
+      "customer_impact": 25,
+      "urgency": 78
+    },
+    {
+      "id": "demo-039",
+      "title": "Invoice 40",
+      "filename": "invoice-40.md",
+      "path": "demo/invoice/40.md",
+      "type": "invoice",
+      "preview": "Registro fictício 40 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-20T09:00:00Z",
+      "tags": [
+        "invoice",
+        "demo"
+      ],
+      "priority": 2,
+      "revenue_impact": 82,
+      "customer_impact": 13,
+      "urgency": 77
+    },
+    {
+      "id": "demo-040",
+      "title": "Project 41",
+      "filename": "project-41.md",
+      "path": "demo/project/41.md",
+      "type": "project",
+      "preview": "Registro fictício 41 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-01T09:00:00Z",
+      "tags": [
+        "project",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 59,
+      "customer_impact": 84,
+      "urgency": 72
+    },
+    {
+      "id": "demo-041",
+      "title": "Lead 42",
+      "filename": "lead-42.md",
+      "path": "demo/lead/42.md",
+      "type": "lead",
+      "preview": "Registro fictício 42 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-02T09:00:00Z",
+      "tags": [
+        "lead",
+        "demo"
+      ],
+      "priority": 4,
+      "revenue_impact": 69,
+      "customer_impact": 87,
+      "urgency": 94
+    },
+    {
+      "id": "demo-042",
+      "title": "Task 43",
+      "filename": "task-43.md",
+      "path": "demo/task/43.md",
+      "type": "task",
+      "preview": "Registro fictício 43 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-03T09:00:00Z",
+      "tags": [
+        "task",
+        "demo"
+      ],
+      "priority": 4,
+      "revenue_impact": 5,
+      "customer_impact": 1,
+      "urgency": 25
+    },
+    {
+      "id": "demo-043",
+      "title": "Meeting 44",
+      "filename": "meeting-44.md",
+      "path": "demo/meeting/44.md",
+      "type": "meeting",
+      "preview": "Registro fictício 44 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-04T09:00:00Z",
+      "tags": [
+        "meeting",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 18,
+      "customer_impact": 21,
+      "urgency": 54
+    },
+    {
+      "id": "demo-044",
+      "title": "Proposal 45",
+      "filename": "proposal-45.md",
+      "path": "demo/proposal/45.md",
+      "type": "proposal",
+      "preview": "Registro fictício 45 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-05T09:00:00Z",
+      "tags": [
+        "proposal",
+        "demo"
+      ],
+      "priority": 4,
+      "revenue_impact": 95,
+      "customer_impact": 46,
+      "urgency": 100
+    },
+    {
+      "id": "demo-045",
+      "title": "Note 46",
+      "filename": "note-46.md",
+      "path": "demo/note/46.md",
+      "type": "note",
+      "preview": "Registro fictício 46 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-06T09:00:00Z",
+      "tags": [
+        "note",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 86,
+      "customer_impact": 7,
+      "urgency": 83
+    },
+    {
+      "id": "demo-046",
+      "title": "Concept 47",
+      "filename": "concept-47.md",
+      "path": "demo/concept/47.md",
+      "type": "concept",
+      "preview": "Registro fictício 47 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-07T09:00:00Z",
+      "tags": [
+        "concept",
+        "demo"
+      ],
+      "priority": 4,
+      "revenue_impact": 60,
+      "customer_impact": 32,
+      "urgency": 8
+    },
+    {
+      "id": "demo-047",
+      "title": "Invoice 48",
+      "filename": "invoice-48.md",
+      "path": "demo/invoice/48.md",
+      "type": "invoice",
+      "preview": "Registro fictício 48 para operação demonstrativa da RANKBRUM ONE AI.",
+      "modified_at": "2026-08-08T09:00:00Z",
+      "tags": [
+        "invoice",
+        "demo"
+      ],
+      "priority": 3,
+      "revenue_impact": 7,
+      "customer_impact": 81,
+      "urgency": 35
+    }
+  ],
+  "edges": [
+    {
+      "source": "demo-000",
+      "target": "demo-003"
+    },
+    {
+      "source": "demo-001",
+      "target": "demo-010"
+    },
+    {
+      "source": "demo-002",
+      "target": "demo-017"
+    },
+    {
+      "source": "demo-003",
+      "target": "demo-024"
+    },
+    {
+      "source": "demo-004",
+      "target": "demo-031"
+    },
+    {
+      "source": "demo-005",
+      "target": "demo-038"
+    },
+    {
+      "source": "demo-006",
+      "target": "demo-045"
+    },
+    {
+      "source": "demo-007",
+      "target": "demo-004"
+    },
+    {
+      "source": "demo-008",
+      "target": "demo-011"
+    },
+    {
+      "source": "demo-009",
+      "target": "demo-018"
+    },
+    {
+      "source": "demo-010",
+      "target": "demo-025"
+    },
+    {
+      "source": "demo-011",
+      "target": "demo-032"
+    },
+    {
+      "source": "demo-012",
+      "target": "demo-039"
+    },
+    {
+      "source": "demo-013",
+      "target": "demo-046"
+    },
+    {
+      "source": "demo-014",
+      "target": "demo-005"
+    },
+    {
+      "source": "demo-015",
+      "target": "demo-012"
+    },
+    {
+      "source": "demo-016",
+      "target": "demo-019"
+    },
+    {
+      "source": "demo-017",
+      "target": "demo-026"
+    },
+    {
+      "source": "demo-018",
+      "target": "demo-033"
+    },
+    {
+      "source": "demo-019",
+      "target": "demo-040"
+    },
+    {
+      "source": "demo-020",
+      "target": "demo-047"
+    },
+    {
+      "source": "demo-021",
+      "target": "demo-006"
+    },
+    {
+      "source": "demo-022",
+      "target": "demo-013"
+    },
+    {
+      "source": "demo-023",
+      "target": "demo-020"
+    },
+    {
+      "source": "demo-024",
+      "target": "demo-027"
+    },
+    {
+      "source": "demo-025",
+      "target": "demo-034"
+    },
+    {
+      "source": "demo-026",
+      "target": "demo-041"
+    },
+    {
+      "source": "demo-027",
+      "target": "demo-000"
+    },
+    {
+      "source": "demo-028",
+      "target": "demo-007"
+    },
+    {
+      "source": "demo-029",
+      "target": "demo-014"
+    },
+    {
+      "source": "demo-030",
+      "target": "demo-021"
+    },
+    {
+      "source": "demo-031",
+      "target": "demo-028"
+    },
+    {
+      "source": "demo-032",
+      "target": "demo-035"
+    },
+    {
+      "source": "demo-033",
+      "target": "demo-042"
+    },
+    {
+      "source": "demo-034",
+      "target": "demo-001"
+    },
+    {
+      "source": "demo-035",
+      "target": "demo-008"
+    },
+    {
+      "source": "demo-036",
+      "target": "demo-015"
+    },
+    {
+      "source": "demo-037",
+      "target": "demo-022"
+    },
+    {
+      "source": "demo-038",
+      "target": "demo-029"
+    },
+    {
+      "source": "demo-039",
+      "target": "demo-036"
+    },
+    {
+      "source": "demo-040",
+      "target": "demo-043"
+    },
+    {
+      "source": "demo-041",
+      "target": "demo-002"
+    },
+    {
+      "source": "demo-042",
+      "target": "demo-009"
+    },
+    {
+      "source": "demo-043",
+      "target": "demo-016"
+    },
+    {
+      "source": "demo-044",
+      "target": "demo-023"
+    },
+    {
+      "source": "demo-045",
+      "target": "demo-030"
+    },
+    {
+      "source": "demo-046",
+      "target": "demo-037"
+    },
+    {
+      "source": "demo-047",
+      "target": "demo-044"
+    }
+  ]
+}
