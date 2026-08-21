@@ -68,3 +68,35 @@ Também foi executado `git diff --check` sem erros de espaço em branco.
 O roteamento é propositalmente heurístico e local. Nenhuma integração externa ou
 ação implícita foi adicionada; pedidos não reconhecidos permanecem no modo
 limitado até que um provedor de LLM seja configurado.
+
+## Fix Round 1
+
+- A memória agora só é roteada por um comando positivo direto no início da
+  mensagem. Formas negadas, ambíguas e sem fato permanecem como conversa e não
+  recebem confirmação de gravação.
+- Quando há `LLMProvider`, o conteúdo de `agent/prompt.md` é enviado como a
+  primeira mensagem `system`; assim, idioma, fontes e guardrails passam a afetar
+  a execução do provedor.
+- Os novos testes de regressão preservam a construção de `MemoryStore` com
+  `application_root` e o diretório exato `<application_root>/memory`.
+
+Verificação focada:
+
+```text
+C:\Users\renan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m unittest tests.test_agent tests.test_tools -v
+```
+
+Resultado: `Ran 10 tests ... OK`.
+
+Verificação completa:
+
+```text
+C:\Users\renan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m unittest discover -v
+```
+
+Resultado: `Ran 29 tests ... OK`.
+
+Também foram executados `git diff --check` e `git diff --cached --check`, sem
+erros de espaço em branco.
+
+Commit: `fix: harden memory routing and load prompt`

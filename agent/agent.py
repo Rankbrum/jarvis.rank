@@ -1,8 +1,12 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 from agent.llm import LLMProvider
 from agent.router import FallbackRouter
 from agent.tools import ToolRegistry, ToolResult
+
+
+PROMPT = Path(__file__).with_name("prompt.md").read_text(encoding="utf-8")
 
 
 @dataclass(frozen=True)
@@ -40,7 +44,8 @@ class JarvisAgent:
                 result = self.tools.execute(intent.tool, intent.arguments)
             elif self.llm is not None:
                 answer = self.llm.complete(
-                    [
+                    [{"role": "system", "content": PROMPT}]
+                    + [
                         {"role": turn.role, "content": turn.text}
                         for turn in self.history
                     ]

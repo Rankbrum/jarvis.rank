@@ -50,6 +50,16 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(router.route("planeje meu dia", []).tool, "plan_day")
         self.assertEqual(router.route("bom dia", []).kind, "conversation")
 
+    def test_router_rejects_negated_ambiguous_and_empty_memory_requests(self):
+        router = FallbackRouter()
+        for request in (
+            "Não memorize isto.",
+            "Talvez lembre que isto é importante.",
+            "lembre que",
+            "guarde",
+        ):
+            self.assertEqual(router.route(request, []).kind, "conversation")
+
     def test_ordinary_conversation_does_not_create_memory(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -82,7 +92,9 @@ class AgentTests(unittest.TestCase):
             result = self.make_agent(Path(tmp), llm=provider).respond("bom dia")
             self.assertEqual(len(result.spoken), 240)
             self.assertEqual(result.card["type"], "conversation")
-            self.assertEqual(provider.messages, [{"role": "user", "content": "bom dia"}])
+            self.assertEqual(provider.messages[0]["role"], "system")
+            self.assertIn("Responda em português do Brasil", provider.messages[0]["content"])
+            self.assertEqual(provider.messages[1], {"role": "user", "content": "bom dia"})
 
 
 if __name__ == "__main__":

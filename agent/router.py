@@ -3,6 +3,12 @@ from dataclasses import dataclass, field
 from typing import Sequence
 
 
+MEMORY_COMMAND_RE = re.compile(
+    r"^\s*(?:lembre|memorize|guarde)(?:-se)?\s+(?:que\s+)?(?P<fact>\S(?:.*\S)?)\s*$",
+    re.IGNORECASE,
+)
+
+
 @dataclass(frozen=True)
 class Intent:
     kind: str
@@ -16,13 +22,9 @@ class FallbackRouter:
     def route(self, text: str, history: Sequence[object]) -> Intent:
         del history
         normalized = text.casefold().strip()
-        if re.search(r"\b(lembre|memorize|guarde)\b", normalized):
-            fact = re.sub(
-                r"^.*?\b(?:lembre|memorize|guarde)(?:-se)?\s+(?:que\s+)?",
-                "",
-                text,
-                flags=re.IGNORECASE,
-            ).strip()
+        memory_match = MEMORY_COMMAND_RE.match(text)
+        if memory_match and memory_match["fact"].casefold() != "que":
+            fact = memory_match["fact"]
             return Intent("tool", "remember", {"fact": fact, "confirmed": True})
         if re.search(r"\b(planeje|prioridades|plano do dia)\b", normalized):
             return Intent("tool", "plan_day")
