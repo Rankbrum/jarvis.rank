@@ -1,1 +1,7 @@
 .worktrees/
+.env
+__pycache__/
+*.py[cod]
+.coverage
+memory/*.md
+data/local/
