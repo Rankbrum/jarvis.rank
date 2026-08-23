@@ -66,6 +66,13 @@ class AgentRegistry:
             cls._instance._initialized = False
         return cls._instance
     
+    @classmethod
+    def get_instance(cls) -> "AgentRegistry":
+        """Get singleton instance of AgentRegistry"""
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+    
     def __init__(self):
         if self._initialized:
             return
