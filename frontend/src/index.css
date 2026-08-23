@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --jarvis-dark: #0a0e1a;
+  --jarvis-primary: #00d4ff;
+  --jarvis-secondary: #7b2cbf;
+  --jarvis-accent: #e040fb;
+  --jarvis-success: #00ff88;
+  --jarvis-warning: #ffaa00;
+  --jarvis-error: #ff4466;
+  --jarvis-surface: #121826;
+  --jarvis-border: #1e293b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--jarvis-dark);
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--jarvis-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--jarvis-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--jarvis-primary);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg) translateX(120px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(120px) rotate(-360deg);
+  }
+}
+
+@keyframes data-stream {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-data-stream {
+  animation: data-stream 1.5s ease-in-out infinite;
+}
+
+/* Utility classes */
+.jarvis-gradient {
+  background: linear-gradient(135deg, var(--jarvis-primary), var(--jarvis-secondary));
+}
+
+.jarvis-glow {
+  box-shadow: 0 0 10px var(--jarvis-primary), 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.agent-node {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.agent-node:hover {
+  transform: scale(1.1);
+}
+
+.agent-connection {
+  stroke-dasharray: 5;
+  animation: dash 30s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
