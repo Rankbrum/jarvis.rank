@@ -10,7 +10,7 @@ from sqlalchemy.orm import DeclarativeBase
 from typing import AsyncGenerator
 import logging
 
-from backend.config import settings, get_settings
+from config import settings, get_settings
 
 logger = logging.getLogger(__name__)
 

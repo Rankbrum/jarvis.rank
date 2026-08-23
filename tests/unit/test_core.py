@@ -7,6 +7,13 @@ Run with: pytest tests/unit/ -v
 
 import pytest
 import asyncio
+import sys
+from pathlib import Path
+
+# Add backend to path
+backend_path = Path(__file__).parent.parent.parent / "backend"
+sys.path.insert(0, str(backend_path))
+
 from unittest.mock import AsyncMock, MagicMock, patch
 from datetime import datetime
 
@@ -16,7 +23,7 @@ class TestEventBus:
     
     def test_event_creation(self):
         """Test event creation and serialization"""
-        from backend.events.event_bus import Event, EventType
+        from events.event_bus import Event, EventType
         
         event = Event(
             event_type=EventType.MISSION_CREATED,
@@ -37,7 +44,7 @@ class TestEventBus:
     @pytest.mark.asyncio
     async def test_event_publish(self):
         """Test event publishing to subscribers"""
-        from backend.events.event_bus import EventBus, EventType, Event
+        from events.event_bus import EventBus, EventType, Event
         
         bus = EventBus()
         received_events = []
@@ -61,7 +68,7 @@ class TestEventBus:
     @pytest.mark.asyncio
     async def test_event_history(self):
         """Test event history retrieval"""
-        from backend.events.event_bus import EventBus, EventType
+        from events.event_bus import EventBus, EventType
         
         bus = EventBus()
         bus.clear_history()
@@ -85,7 +92,7 @@ class TestAgentRegistry:
     
     def test_registry_singleton(self):
         """Test registry is a singleton"""
-        from backend.agents.agent_registry import agent_registry, AgentRegistry
+        from agents.agent_registry import agent_registry, AgentRegistry
         
         registry1 = AgentRegistry()
         registry2 = AgentRegistry()
@@ -95,7 +102,7 @@ class TestAgentRegistry:
     
     def test_hierarchy_validation(self):
         """Test hierarchy validation logic"""
-        from backend.agents.agent_registry import AgentRegistry
+        from agents.agent_registry import AgentRegistry
         
         registry = AgentRegistry()
         
@@ -117,7 +124,7 @@ class TestSkillRegistry:
     
     def test_registry_singleton(self):
         """Test registry is a singleton"""
-        from backend.skills.skill_registry import skill_registry, SkillRegistry
+        from skills.skill_registry import skill_registry, SkillRegistry
         
         registry1 = SkillRegistry()
         registry2 = SkillRegistry()
@@ -127,7 +134,7 @@ class TestSkillRegistry:
     
     def test_skill_definition(self):
         """Test skill definition creation"""
-        from backend.skills.skill_registry import SkillDefinition
+        from skills.skill_registry import SkillDefinition
         
         skill = SkillDefinition(
             id="skill-123",
@@ -148,7 +155,7 @@ class TestSkillRegistry:
     
     def test_compatibility_validation(self):
         """Test agent-skill compatibility validation"""
-        from backend.skills.skill_registry import SkillRegistry
+        from skills.skill_registry import SkillRegistry
         
         registry = SkillRegistry()
         
@@ -172,7 +179,7 @@ class TestSkillRegistry:
     
     def test_incompatible_agent(self):
         """Test incompatible agent validation"""
-        from backend.skills.skill_registry import SkillRegistry
+        from skills.skill_registry import SkillRegistry
         
         registry = SkillRegistry()
         
@@ -201,7 +208,7 @@ class TestToolRegistry:
     
     def test_registry_singleton(self):
         """Test registry is a singleton"""
-        from backend.tools.tool_registry import tool_registry, ToolRegistry
+        from tools.tool_registry import tool_registry, ToolRegistry
         
         registry1 = ToolRegistry()
         registry2 = ToolRegistry()
@@ -211,7 +218,7 @@ class TestToolRegistry:
     
     def test_tool_result(self):
         """Test tool result creation"""
-        from backend.tools.tool_registry import ToolResult
+        from tools.tool_registry import ToolResult
         
         result = ToolResult(
             success=True,
@@ -229,7 +236,7 @@ class TestToolRegistry:
     @pytest.mark.asyncio
     async def test_tool_execution_without_executor(self):
         """Test tool execution when no executor is defined"""
-        from backend.tools.tool_registry import ToolRegistry, ToolDefinition
+        from tools.tool_registry import ToolRegistry, ToolDefinition
         
         registry = ToolRegistry()
         
@@ -265,7 +272,7 @@ class TestOrchestrator:
     
     def test_orchestrator_singleton(self):
         """Test orchestrator is a singleton"""
-        from backend.core.orchestrator import orchestrator, Orchestrator
+        from core.orchestrator import orchestrator, Orchestrator
         
         orch1 = Orchestrator()
         orch2 = Orchestrator()
@@ -275,7 +282,7 @@ class TestOrchestrator:
     
     def test_mission_plan_creation(self):
         """Test mission plan creation"""
-        from backend.core.orchestrator import MissionPlan
+        from core.orchestrator import MissionPlan
         
         plan = MissionPlan("mission-123")
         
@@ -296,7 +303,7 @@ class TestOrchestrator:
     
     def test_limits_enforcement(self):
         """Test execution limits are enforced"""
-        from backend.core.orchestrator import Orchestrator
+        from core.orchestrator import Orchestrator
         
         orch = Orchestrator()
         

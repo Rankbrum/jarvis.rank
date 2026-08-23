@@ -14,14 +14,14 @@ from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from backend.config.models import (
+from config.models import (
     Mission, MissionStatus, Task, TaskStatus,
     Agent, ExecutionLog, User
 )
-from backend.events.event_bus import event_bus, EventType
-from backend.agents.agent_registry import agent_registry, AgentNode
-from backend.skills.skill_registry import skill_registry
-from backend.tools.tool_registry import tool_registry
+from events.event_bus import event_bus, EventType
+from agents.agent_registry import agent_registry, AgentNode
+from skills.skill_registry import skill_registry
+from tools.tool_registry import tool_registry
 
 logger = logging.getLogger(__name__)
 

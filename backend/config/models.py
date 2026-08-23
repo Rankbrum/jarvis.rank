@@ -25,7 +25,7 @@ import uuid
 from datetime import datetime
 from enum import Enum as PyEnum
 
-from backend.config import Base
+from config import Base
 
 
 # Helper to generate UUID v7

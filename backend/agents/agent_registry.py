@@ -15,8 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 
-from backend.config.models import Agent, AgentSkill, AgentTool
-from backend.events.event_bus import event_bus, EventType, Event
+from config.models import Agent, AgentSkill, AgentTool
+from events.event_bus import event_bus, EventType, Event
 
 logger = logging.getLogger(__name__)
 

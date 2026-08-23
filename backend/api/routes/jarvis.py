@@ -10,12 +10,12 @@ from pydantic import BaseModel, Field
 from uuid import UUID, uuid4
 from datetime import datetime
 
-from backend.agents.agent_registry import AgentRegistry
-from backend.skills.skill_registry import SkillRegistry
-from backend.tools.tool_registry import ToolRegistry
-from backend.core.orchestrator import Orchestrator
-from backend.events.event_bus import EventBus
-from backend.config.schemas import AgentCreate, AgentUpdate, MissionCreate, SkillAssignment
+from agents.agent_registry import AgentRegistry
+from skills.skill_registry import SkillRegistry
+from tools.tool_registry import ToolRegistry
+from core.orchestrator import Orchestrator
+from events.event_bus import EventBus
+from config.schemas import AgentCreate, AgentUpdate, MissionCreate, SkillAssignment
 
 # Routers
 router = APIRouter(prefix="/api", tags=["jarvis"])

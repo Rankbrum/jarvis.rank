@@ -12,20 +12,20 @@ import logging
 from typing import AsyncGenerator
 
 # Importar configurações
-from backend.config.settings import settings
+from config.settings import settings
 
 # Importar registries (inicialização lazy)
-from backend.agents.agent_registry import AgentRegistry
-from backend.skills.skill_registry import SkillRegistry
-from backend.tools.tool_registry import ToolRegistry
-from backend.core.orchestrator import Orchestrator
-from backend.events.event_bus import EventBus
+from agents.agent_registry import AgentRegistry
+from skills.skill_registry import SkillRegistry
+from tools.tool_registry import ToolRegistry
+from core.orchestrator import Orchestrator
+from events.event_bus import EventBus
 
 # Importar rotas
-from backend.api.routes.jarvis import router as jarvis_router
+from api.routes.jarvis import router as jarvis_router
 
 # Importar WebSocket
-from backend.api.websocket.manager import websocket_endpoint, get_connection_manager
+from api.websocket.manager import websocket_endpoint, get_connection_manager
 
 # Configurar logging
 logging.basicConfig(

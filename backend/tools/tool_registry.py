@@ -15,8 +15,8 @@ import json
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from backend.config.models import Tool, AgentTool
-from backend.events.event_bus import event_bus, EventType
+from config.models import Tool, AgentTool
+from events.event_bus import event_bus, EventType
 
 logger = logging.getLogger(__name__)
 
